@@ -1,5 +1,5 @@
 /**************************************************************************/
-/*  aes_context.h                                                         */
+/*  crypto_key.cpp                                                        */
 /**************************************************************************/
 /*                         This file is part of:                          */
 /*                             REDOT ENGINE                               */
@@ -30,41 +30,28 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#include "crypto.h"
 
-#include "core/crypto/crypto_core.h"
-#include "core/object/ref_counted.h"
+void CryptoKey::_bind_methods() {
+	ClassDB::bind_method(D_METHOD("save", "path", "public_only"), &CryptoKey::save, DEFVAL(false));
+	ClassDB::bind_method(D_METHOD("load", "path", "public_only"), &CryptoKey::load, DEFVAL(false));
+	ClassDB::bind_method(D_METHOD("is_public_only"), &CryptoKey::is_public_only);
+	ClassDB::bind_method(D_METHOD("save_to_string", "public_only"), &CryptoKey::save_to_string, DEFVAL(false));
+	ClassDB::bind_method(D_METHOD("load_from_string", "string_key", "public_only"), &CryptoKey::load_from_string, DEFVAL(false));
+}
 
-class AESContext : public RefCounted {
-	GDCLASS(AESContext, RefCounted);
-
-public:
-	enum Mode : int32_t {
-		MODE_ECB_ENCRYPT,
-		MODE_ECB_DECRYPT,
-		MODE_CBC_ENCRYPT,
-		MODE_CBC_DECRYPT,
-		MODE_MAX
-	};
-
-private:
-	Mode mode = MODE_MAX;
-	CryptoCore::AESContext ctx;
-	PackedByteArray iv;
-	bool is_initialized() const;
-	const int AES_BLOCK_SIZE = 16;
-
-protected:
-	static void _bind_methods();
-
-public:
-	Error start(Mode p_mode, const PackedByteArray &p_key, const PackedByteArray &p_iv = PackedByteArray());
-	PackedByteArray update(const PackedByteArray &p_src);
-	PackedByteArray get_iv_state();
-	void finish();
-
-	AESContext();
-	~AESContext();
-};
-
-VARIANT_ENUM_CAST(AESContext::Mode);
+/*
+ * Creates a new CryptoKey instance.
+ *
+ * @param p_notify_postinitialize - Whether or not to notify after post-init.
+ *
+ * @return - Pointer to CryptoKey, if successful.
+ *           nullptr, if unsuccessful.
+ */
+CryptoKey *(*CryptoKey::_create)(bool p_notify_postinitialize) = nullptr;
+CryptoKey *CryptoKey::create(bool p_notify_postinitialize) {
+	if (_create) {
+		return _create(p_notify_postinitialize);
+	}
+	return nullptr;
+}

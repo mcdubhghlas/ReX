@@ -1,5 +1,5 @@
 /**************************************************************************/
-/*  aes_context.h                                                         */
+/*  crypto_X509.cpp                                                       */
 /**************************************************************************/
 /*                         This file is part of:                          */
 /*                             REDOT ENGINE                               */
@@ -30,41 +30,27 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#include "crypto.h"
 
-#include "core/crypto/crypto_core.h"
-#include "core/object/ref_counted.h"
+void X509Certificate::_bind_methods() {
+	ClassDB::bind_method(D_METHOD("save", "path"), &X509Certificate::save);
+	ClassDB::bind_method(D_METHOD("load", "path"), &X509Certificate::load);
+	ClassDB::bind_method(D_METHOD("save_to_string"), &X509Certificate::save_to_string);
+	ClassDB::bind_method(D_METHOD("load_from_string", "string"), &X509Certificate::load_from_string);
+}
 
-class AESContext : public RefCounted {
-	GDCLASS(AESContext, RefCounted);
-
-public:
-	enum Mode : int32_t {
-		MODE_ECB_ENCRYPT,
-		MODE_ECB_DECRYPT,
-		MODE_CBC_ENCRYPT,
-		MODE_CBC_DECRYPT,
-		MODE_MAX
-	};
-
-private:
-	Mode mode = MODE_MAX;
-	CryptoCore::AESContext ctx;
-	PackedByteArray iv;
-	bool is_initialized() const;
-	const int AES_BLOCK_SIZE = 16;
-
-protected:
-	static void _bind_methods();
-
-public:
-	Error start(Mode p_mode, const PackedByteArray &p_key, const PackedByteArray &p_iv = PackedByteArray());
-	PackedByteArray update(const PackedByteArray &p_src);
-	PackedByteArray get_iv_state();
-	void finish();
-
-	AESContext();
-	~AESContext();
-};
-
-VARIANT_ENUM_CAST(AESContext::Mode);
+/*
+ * Creates a new X590Certificate instance.
+ *
+ * @param p_notify_postinitialize - Whether or not to notify after post-init.
+ *
+ * @return - Pointer to new X509Certificate, if successful.
+ *           nullptr, if not successful.
+ */
+X509Certificate *(*X509Certificate::_create)(bool p_notify_postinitialize) = nullptr;
+X509Certificate *X509Certificate::create(bool p_notify_postinitialize) {
+	if (_create) {
+		return _create(p_notify_postinitialize);
+	}
+	return nullptr;
+}
