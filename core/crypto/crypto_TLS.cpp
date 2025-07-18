@@ -79,7 +79,7 @@ Ref<TLSOptions> TLSOptions::client(Ref<X509Certificate> p_trusted_chain, const S
  * @return - A configured Ref<TLSOptions> instance, in unsafe client mode.
  */
 Ref<TLSOptions> TLSOptions::client_unsafe(Ref<X509Certificate> p_trusted_chain) {
-	if(p_trusted_chain.is_null() {
+	if (p_trusted_chain.is_null()) {
 		ERR_PRINT("x509 cert is null.");
 		return Ref<TLSOptions>();
 	}
