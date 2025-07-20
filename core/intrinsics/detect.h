@@ -43,7 +43,7 @@
 #if defined(_MSC_VER)
     #include <intrin.h> // MSVC
 #else
-    #include <cpuid.h> // GCC/Clang
+	#include <immintrin.h> // GCC/Clang
 #endif
 
 // SIMD support level
@@ -53,20 +53,6 @@ enum class SIMDLevel : int {
 	AVX2 = 2
 };
 
-/*
- * Safe, unsigned bit check to obtain single feature flag.
- * (32bit variant.)
- *
- * @param val - The value to test.
- *
- * @param bit - The bit index to check.
- *
- * @return - True, if bit is set.
- *           False, if not.
- */
-constexpr bool get_bit32(uint32_t val, int bit) {
-	return (val & (1u << bit)) != 0;
-}
 
 /*
  * Safe, unsigned bit check to obtain single feature flag.
@@ -79,8 +65,9 @@ constexpr bool get_bit32(uint32_t val, int bit) {
  * @return - True, if bit is set.
  *           False, if not.
  */
-constexpr bool get_bit64(uint64_t val, int bit) {
-    return (val & (1ull << bit)) != 0;
+template <typename T>
+constexpr bool get_bit(T val, unsigned int bit) {
+	return (val & (1ull << bit)) != 0;
 }
 
 /*
@@ -91,17 +78,7 @@ inline uint64_t get_xcr0() {
 	#if defined(_MSC_VER)
 		return _xgetbv(0); // Reads XCR0 on Windows.
 	#elif defined(__GNUC__) || defined(__clang__)
-		uint32_t eax = 0;
-		uint32_t edx = 0;
-
-		__asm__ volatile (
-			"xgetbv" // reads content of XCR0.
-			: "=a"(eax), "=d"(edx) // maps EAX to eax, EDX to edx
-			: "c"(0) // Set ECX to zero, specifies index of control reg to read
-		);
-
-		// Combine upper bits [edx] and lower bits [eax] 
-		return ((uint64_t)edx << 32) | eax;
+		return _xgetbv(0);
 	#else
 		return 0; // unknown platform.
 	#endif
@@ -130,10 +107,10 @@ inline SIMDLevel detect_simd_level() {
 		// used: https://www.felixcloutier.com/x86/cpuid && https://x86-cpuid.org/
 		// because I am lazy and got tired of looking at intel's 2.5K+ page doc
 
-		// [CPUID] BIT #27 | OSXSAVE 
-		const bool has_xsave = get_bit32(registers[2], 27); 
-		// [CPUID] BIT #28 | AVX  
-		const bool has_avx = get_bit32(registers[2], 28);
+		// [CPUID] BIT #27 | OSXSAVE
+		const bool has_xsave = get_bit(registers[2], 27);
+		// [CPUID] BIT #28 | AVX
+		const bool has_avx = get_bit(registers[2], 28);
 
 		if (!has_xsave || !has_avx) {
 			return SIMDLevel::NONE;
@@ -143,9 +120,9 @@ inline SIMDLevel detect_simd_level() {
 		const uint64_t xcr0 = get_xcr0();
 
 		// [XCR0] BIT #1 | XSAVE support for MXCSR, XMM.
-		const bool has_xmm = get_bit64(xcr0, 1);
+		const bool has_xmm = get_bit(xcr0, 1);
 		// [XCR0] BIT #2 | AVX enabled, XSAVE for (upper-half) YMM.
-		const bool has_ymm = get_bit64(xcr0, 2);
+		const bool has_ymm = get_bit(xcr0, 2);
 
 		if (!has_xmm || !has_ymm) {
 			return SIMDLevel::NONE;
@@ -157,7 +134,7 @@ inline SIMDLevel detect_simd_level() {
 		__cpuidex(registers, 7, 0);
 
 		// EBX Bit #5 is AVX2
-		const bool has_avx2 = get_bit32(registers[1], 5);
+		const bool has_avx2 = get_bit(registers[1], 5);
 
 		// This seemed cleaner than an if-statement.
 		return has_avx2 ? SIMDLevel::AVX2 : SIMDLevel::AVX;
