@@ -46,17 +46,19 @@
 	#include <immintrin.h> // GCC/Clang
 #endif
 
+namespace simd {
+
 // SIMD support level
 enum class SIMDLevel : int {
 	NONE = 0,
 	AVX = 1,
-	AVX2 = 2
+	AVX2 = 2,
+	AVX512 = 3 // TODO: implement AVX512 detection.
 };
 
 
 /*
  * Safe, unsigned bit check to obtain single feature flag.
- * (64bit variant.)
  *
  * @param val - The value to test.
  *
@@ -70,76 +72,8 @@ constexpr bool get_bit(T val, unsigned int bit) {
 	return (val & (1ull << bit)) != 0;
 }
 
-/*
- * Use XGETBV to check if OS has enabled saving/restoring YMM state. This is
- * required for using AVX instructions safely.
- */
-inline uint64_t get_xcr0() {
-	#if defined(_MSC_VER)
-		return _xgetbv(0); // Reads XCR0 on Windows.
-	#elif defined(__GNUC__) || defined(__clang__)
-		return _xgetbv(0);
-	#else
-		return 0; // unknown platform.
-	#endif
-}
 
-/*
- * Detect highest SIMD level supported at runtime.
- */
-inline SIMDLevel detect_simd_level() {
-	#if defined(__GNUC__) || defined(__clang__)
-		// Thankfully, GCC/Clang have compiler builts-ins.
-		if(__builtin_cpu_supports("avx2")) {
-			return SIMDLevel::AVX2;
-		} else if(__builtin_cpu_supports("avx")) {
-			return SIMDLevel::AVX;
-		} else {
-			return SIMDLevel::NONE;
-		}
-	#elif defined(_MSC_VER)
-		int registers[4] = {};
+uint64_t get_xcr0();
+SIMDLevel detect_simd_level();
 
-		// Call CPUID function 1 to check AVX / OSXSAVE.
-		__cpuid(registers, 1);
-
-		// Be not afraid of the bitshift.
-		// used: https://www.felixcloutier.com/x86/cpuid && https://x86-cpuid.org/
-		// because I am lazy and got tired of looking at intel's 2.5K+ page doc
-
-		// [CPUID] BIT #27 | OSXSAVE
-		const bool has_xsave = get_bit(registers[2], 27);
-		// [CPUID] BIT #28 | AVX
-		const bool has_avx = get_bit(registers[2], 28);
-
-		if (!has_xsave || !has_avx) {
-			return SIMDLevel::NONE;
-		}
-
-		// Check OS has enabled saving of XMM/YMM registers
-		const uint64_t xcr0 = get_xcr0();
-
-		// [XCR0] BIT #1 | XSAVE support for MXCSR, XMM.
-		const bool has_xmm = get_bit(xcr0, 1);
-		// [XCR0] BIT #2 | AVX enabled, XSAVE for (upper-half) YMM.
-		const bool has_ymm = get_bit(xcr0, 2);
-
-		if (!has_xmm || !has_ymm) {
-			return SIMDLevel::NONE;
-		}
-
-		// Check AVX2 using CPUID function 7 (feature flag), subfunction 0
-		// EAX = 7, ECX = 0
-		// used: https://sandpile.org/x86/cpuid.htm
-		__cpuidex(registers, 7, 0);
-
-		// EBX Bit #5 is AVX2
-		const bool has_avx2 = get_bit(registers[1], 5);
-
-		// This seemed cleaner than an if-statement.
-		return has_avx2 ? SIMDLevel::AVX2 : SIMDLevel::AVX;
-	#else
-		// Fallback to unknown compiler/platform
-		return SIMDLevel::NONE;
-	#endif
-}
+} // namespace: simd
