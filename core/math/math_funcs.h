@@ -193,46 +193,41 @@ _ALWAYS_INLINE_ constexpr bool is_inf(T val) {
 	return std::isinf(val);
 }
 
-// These methods assume (p_num + p_den) doesn't overflow.
-_ALWAYS_INLINE_ int32_t division_round_up(int32_t p_num, int32_t p_den) {
-	int32_t offset = (p_num < 0 && p_den < 0) ? 1 : -1;
-	return (p_num + p_den + offset) / p_den;
-}
-_ALWAYS_INLINE_ uint32_t division_round_up(uint32_t p_num, uint32_t p_den) {
-	return (p_num + p_den - 1) / p_den;
-}
-_ALWAYS_INLINE_ int64_t division_round_up(int64_t p_num, int64_t p_den) {
-	int32_t offset = (p_num < 0 && p_den < 0) ? 1 : -1;
-	return (p_num + p_den + offset) / p_den;
-}
-_ALWAYS_INLINE_ uint64_t division_round_up(uint64_t p_num, uint64_t p_den) {
-	return (p_num + p_den - 1) / p_den;
-}
-
-_ALWAYS_INLINE_ bool is_finite(double p_val) {
-	return std::isfinite(p_val);
-}
-_ALWAYS_INLINE_ bool is_finite(float p_val) {
-	return std::isfinite(p_val);
+template <std::integral T>
+_ALWAYS_INLINE_ constexpr T division_round_up(T numerator, T denominator) {
+	// WARNING: Assumes numerator + denominator - 1 will not overflow.
+	if constexpr (std::is_unsigned_v<T>) {
+		return (numerator + denominator - 1) / denominator;
+	} else {
+		// Avoid the overflow by detecting sign of both ops.
+		if ((numerator ^ denominator) >= 0) {
+			// Round up.
+			return (numerator + denominator - 1) / denominator;
+		} else {
+			// Do not round up.
+			return numerator / denominator;
+		}
+	}
 }
 
-_ALWAYS_INLINE_ double abs(double p_value) {
-	return std::abs(p_value);
+template <std::floating_point T>
+_ALWAYS_INLINE_ bool is_finite(T val) {
+	return std::isfinite(val);
 }
-_ALWAYS_INLINE_ float abs(float p_value) {
-	return std::abs(p_value);
-}
-_ALWAYS_INLINE_ int8_t abs(int8_t p_value) {
-	return p_value > 0 ? p_value : -p_value;
-}
-_ALWAYS_INLINE_ int16_t abs(int16_t p_value) {
-	return p_value > 0 ? p_value : -p_value;
-}
-_ALWAYS_INLINE_ int32_t abs(int32_t p_value) {
-	return std::abs(p_value);
-}
-_ALWAYS_INLINE_ int64_t abs(int64_t p_value) {
-	return std::abs(p_value);
+
+template <typename T>
+_ALWAYS_INLINE_ T abs(T value) {
+	if constexpr (std::is_same_v<T, float> || std::is_same_v<T, double>) {
+		// Use std::abs for float/double for hardware optimizations.
+		return std::abs(value);
+	} else if constexpr (std::is_signed_v<T>) {
+		// Manually compute abs for other signed types.
+		// Also avoids potential int8_t -> int issues.
+		return value < T(0) ? -value : value;
+	} else {
+		// unsigned is always positive! :^)
+		return value;
+	}
 }
 
 _ALWAYS_INLINE_ double fposmod(double p_x, double p_y) {
