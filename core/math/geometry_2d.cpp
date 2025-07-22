@@ -38,7 +38,7 @@
 #include "thirdparty/misc/stb_rect_pack.h"
 
 const int clipper_precision = 5; // Based on CMP_EPSILON.
-const double clipper_scale = Math::pow(10.0, clipper_precision);
+const double clipper_scale = Math::pow(10.0, static_cast<double>(clipper_precision));
 
 void Geometry2D::merge_many_polygons(const Vector<Vector<Vector2>> &p_polygons, Vector<Vector<Vector2>> &r_out_polygons, Vector<Vector<Vector2>> &r_out_holes) {
 	using namespace Clipper2Lib;

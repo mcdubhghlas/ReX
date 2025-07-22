@@ -476,8 +476,8 @@ Point2 CanvasItemEditor::snap_point(Point2 p_target, unsigned int p_modes, unsig
 			}
 		}
 		Point2 grid_output;
-		grid_output.x = Math::snapped(p_target.x - offset.x, grid_step.x * Math::pow(2.0, grid_step_multiplier)) + offset.x;
-		grid_output.y = Math::snapped(p_target.y - offset.y, grid_step.y * Math::pow(2.0, grid_step_multiplier)) + offset.y;
+		grid_output.x = Math::snapped(p_target.x - offset.x, grid_step.x * Math::pow(2.0, static_cast<double>(grid_step_multiplier))) + offset.x;
+		grid_output.y = Math::snapped(p_target.y - offset.y, grid_step.y * Math::pow(2.0, static_cast<double>(grid_step_multiplier))) + offset.y;
 		_snap_if_closer_point(p_target, output, snap_target, grid_output, SNAP_TARGET_GRID, 0.0, -1.0);
 	}
 
@@ -522,7 +522,7 @@ void CanvasItemEditor::shortcut_input(const Ref<InputEvent> &p_ev) {
 				viewport->queue_redraw();
 			} else if (divide_grid_step_shortcut.is_valid() && divide_grid_step_shortcut->matches_event(p_ev)) {
 				// Divide the grid size
-				Point2 new_grid_step = grid_step * Math::pow(2.0, grid_step_multiplier - 1);
+				Point2 new_grid_step = grid_step * Math::pow(2.0, static_cast<double>(grid_step_multiplier - 1));
 				if (new_grid_step.x >= 1.0 && new_grid_step.y >= 1.0) {
 					grid_step_multiplier--;
 				}
@@ -2347,12 +2347,12 @@ bool CanvasItemEditor::_gui_input_move(const Ref<InputEvent> &p_event) {
 				dir += Vector2(1, 0);
 			}
 			if (k->is_shift_pressed()) {
-				dir *= grid_step * Math::pow(2.0, grid_step_multiplier);
+				dir *= grid_step * Math::pow(2.0, static_cast<double>(grid_step_multiplier));
 			}
 
 			drag_to += dir;
 			if (k->is_shift_pressed()) {
-				drag_to = drag_to.snapped(grid_step * Math::pow(2.0, grid_step_multiplier));
+				drag_to = drag_to.snapped(grid_step * Math::pow(2.0, static_cast<double>(grid_step_multiplier)));
 			}
 
 			Point2 previous_pos;
@@ -3080,10 +3080,10 @@ void CanvasItemEditor::_draw_rulers() {
 		List<CanvasItem *> selection = _get_edited_canvas_items();
 		if (snap_relative && selection.size() > 0) {
 			ruler_transform.translate_local(_get_encompassing_rect_from_list(selection).position);
-			ruler_transform.scale_basis(grid_step * Math::pow(2.0, grid_step_multiplier));
+			ruler_transform.scale_basis(grid_step * Math::pow(2.0, static_cast<double>(grid_step_multiplier)));
 		} else {
 			ruler_transform.translate_local(grid_offset);
-			ruler_transform.scale_basis(grid_step * Math::pow(2.0, grid_step_multiplier));
+			ruler_transform.scale_basis(grid_step * Math::pow(2.0, static_cast<double>(grid_step_multiplier)));
 		}
 		while ((transform * ruler_transform).get_scale().x < 50 || (transform * ruler_transform).get_scale().y < 50) {
 			ruler_transform.scale_basis(Point2(2, 2));
@@ -3163,8 +3163,8 @@ void CanvasItemEditor::_draw_grid() {
 
 		if (snap_relative && selection.size() > 0) {
 			const Vector2 topleft = _get_encompassing_rect_from_list(selection).position;
-			real_grid_offset.x = std::fmod(topleft.x, grid_step.x * (real_t)Math::pow(2.0, grid_step_multiplier));
-			real_grid_offset.y = std::fmod(topleft.y, grid_step.y * (real_t)Math::pow(2.0, grid_step_multiplier));
+			real_grid_offset.x = std::fmod(topleft.x, grid_step.x * (real_t)Math::pow(2.0, static_cast<double>(grid_step_multiplier)));
+			real_grid_offset.y = std::fmod(topleft.y, grid_step.y * (real_t)Math::pow(2.0, static_cast<double>(grid_step_multiplier)));
 		} else {
 			real_grid_offset = grid_offset;
 		}
@@ -3182,7 +3182,7 @@ void CanvasItemEditor::_draw_grid() {
 		if (grid_step.x != 0) {
 			for (int i = 0; i < viewport_size.width; i++) {
 				const int cell =
-						Math::fast_ftoi(Math::floor((xform.xform(Vector2(i, 0)).x - real_grid_offset.x) / (grid_step.x * Math::pow(2.0, grid_step_multiplier))));
+						Math::fast_ftoi(Math::floor((xform.xform(Vector2(i, 0)).x - real_grid_offset.x) / (grid_step.x * Math::pow(2.0, static_cast<double>(grid_step_multiplier)))));
 
 				if (i == 0) {
 					last_cell = cell;
@@ -3205,7 +3205,7 @@ void CanvasItemEditor::_draw_grid() {
 		if (grid_step.y != 0) {
 			for (int i = 0; i < viewport_size.height; i++) {
 				const int cell =
-						Math::fast_ftoi(Math::floor((xform.xform(Vector2(0, i)).y - real_grid_offset.y) / (grid_step.y * Math::pow(2.0, grid_step_multiplier))));
+						Math::fast_ftoi(Math::floor((xform.xform(Vector2(0, i)).y - real_grid_offset.y) / (grid_step.y * Math::pow(2.0, static_cast<double>(grid_step_multiplier)))));
 
 				if (i == 0) {
 					last_cell = cell;

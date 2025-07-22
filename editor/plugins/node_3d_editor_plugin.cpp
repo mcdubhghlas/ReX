@@ -2277,7 +2277,7 @@ void Node3DEditorViewport::_sinput(const Ref<InputEvent> &p_event) {
 			if (unicode >= '0' && unicode <= '9') {
 				uint32_t value = uint32_t(unicode - Key::KEY_0);
 				if (_edit.numeric_next_decimal < 0) {
-					_edit.numeric_input = _edit.numeric_input + value * Math::pow(10.0, _edit.numeric_next_decimal--);
+					_edit.numeric_input = _edit.numeric_input + value * Math::pow(10.0, static_cast<double>(_edit.numeric_next_decimal--));
 				} else {
 					_edit.numeric_input = _edit.numeric_input * 10 + value;
 				}
@@ -7782,7 +7782,7 @@ void Node3DEditor::_init_grid() {
 		real_t division_level_floored = Math::floor(clamped_division_level);
 		real_t division_level_decimals = clamped_division_level - division_level_floored;
 
-		real_t small_step_size = Math::pow(primary_grid_steps, division_level_floored);
+		real_t small_step_size = Math::pow(static_cast<real_t>(primary_grid_steps), division_level_floored);
 		real_t large_step_size = small_step_size * primary_grid_steps;
 		real_t center_a = large_step_size * (int)(camera_position[a] / large_step_size);
 		real_t center_b = large_step_size * (int)(camera_position[b] / large_step_size);
@@ -7792,9 +7792,9 @@ void Node3DEditor::_init_grid() {
 		real_t bgn_b = center_b - grid_size * small_step_size;
 		real_t end_b = center_b + grid_size * small_step_size;
 
-		real_t fade_size = Math::pow(primary_grid_steps, division_level - 1.0);
-		real_t min_fade_size = Math::pow(primary_grid_steps, float(division_level_min));
-		real_t max_fade_size = Math::pow(primary_grid_steps, float(division_level_max));
+		real_t fade_size = Math::pow(static_cast<double>(primary_grid_steps), division_level - 1.0);
+		real_t min_fade_size = Math::pow(static_cast<float>(primary_grid_steps), float(division_level_min));
+		real_t max_fade_size = Math::pow(static_cast<float>(primary_grid_steps), float(division_level_max));
 		fade_size = CLAMP(fade_size, min_fade_size, max_fade_size);
 
 		real_t grid_fade_size = (grid_size - primary_grid_steps) * fade_size;
