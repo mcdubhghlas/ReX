@@ -35,9 +35,16 @@
 #include "core/math/basis.h"
 #include "core/string/ustring.h"
 
+/*
+ * Computes the angle (in rad) between this quaternion and another, while
+ * assuming both are normalized.
+ *
+ * @param p_to - The target quaternion.
+ *
+ * @return - Angle in radians, between the two rotations.
+ */
 real_t Quaternion::angle_to(const Quaternion &p_to) const {
 	real_t d = dot(p_to);
-	// acos does clamping.
 	return Math::acos(d * d * 2 - 1);
 }
 

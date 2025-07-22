@@ -37,203 +37,160 @@
 #include "core/typedefs.h"
 
 #include <cfloat>
+#include <concepts> // std::floating_point
 #include <cmath>
 
 namespace Math {
 
-_ALWAYS_INLINE_ double sin(double p_x) {
-	return std::sin(p_x);
-}
-_ALWAYS_INLINE_ float sin(float p_x) {
-	return std::sin(p_x);
-}
-
-_ALWAYS_INLINE_ double cos(double p_x) {
-	return std::cos(p_x);
-}
-_ALWAYS_INLINE_ float cos(float p_x) {
-	return std::cos(p_x);
+/*
+ * Less overhead vs std::clamp due to just comparing values,
+ * lowers <algorithm> dependency in this file, too.
+ */
+template <typename T>
+constexpr T clamp(T x, T min, T max) {
+	return (x < min) ? min : (x > max ? max : x);
 }
 
-_ALWAYS_INLINE_ double tan(double p_x) {
-	return std::tan(p_x);
-}
-_ALWAYS_INLINE_ float tan(float p_x) {
-	return std::tan(p_x);
+template <std::floating_point T>
+_ALWAYS_INLINE_ constexpr T sin(T x) {
+	return std::sin(x);
 }
 
-_ALWAYS_INLINE_ double sinh(double p_x) {
-	return std::sinh(p_x);
-}
-_ALWAYS_INLINE_ float sinh(float p_x) {
-	return std::sinh(p_x);
+template <std::floating_point T>
+_ALWAYS_INLINE_ constexpr T cos(T x) {
+	return std::cos(x);
 }
 
-_ALWAYS_INLINE_ double sinc(double p_x) {
-	return p_x == 0 ? 1 : sin(p_x) / p_x;
-}
-_ALWAYS_INLINE_ float sinc(float p_x) {
-	return p_x == 0 ? 1 : sin(p_x) / p_x;
+template <std::floating_point T>
+_ALWAYS_INLINE_ constexpr T tan(T x) {
+	return std::tan(x);
 }
 
-_ALWAYS_INLINE_ double sincn(double p_x) {
-	return sinc(PI * p_x);
-}
-_ALWAYS_INLINE_ float sincn(float p_x) {
-	return sinc((float)PI * p_x);
+template <std::floating_point T>
+_ALWAYS_INLINE_ constexpr T sinh(T x) {
+	return std::sinh(x);
 }
 
-_ALWAYS_INLINE_ double cosh(double p_x) {
-	return std::cosh(p_x);
-}
-_ALWAYS_INLINE_ float cosh(float p_x) {
-	return std::cosh(p_x);
+template <std::floating_point T>
+_ALWAYS_INLINE_ constexpr T sinc(T x) {
+	return x == T(0) ? T(1) : sin(x) / x;
 }
 
-_ALWAYS_INLINE_ double tanh(double p_x) {
-	return std::tanh(p_x);
-}
-_ALWAYS_INLINE_ float tanh(float p_x) {
-	return std::tanh(p_x);
+template <std::floating_point T>
+_ALWAYS_INLINE_ constexpr T sincn(T x) {
+	return sinc(static_cast<T>(PI) * x);
 }
 
-// Always does clamping so always safe to use.
-_ALWAYS_INLINE_ double asin(double p_x) {
-	return p_x < -1 ? (-PI / 2) : (p_x > 1 ? (PI / 2) : std::asin(p_x));
-}
-_ALWAYS_INLINE_ float asin(float p_x) {
-	return p_x < -1 ? (-(float)PI / 2) : (p_x > 1 ? ((float)PI / 2) : std::asin(p_x));
+template <std::floating_point T>
+_ALWAYS_INLINE_ constexpr T cosh(T x) {
+	return std::cosh(x);
 }
 
-// Always does clamping so always safe to use.
-_ALWAYS_INLINE_ double acos(double p_x) {
-	return p_x < -1 ? PI : (p_x > 1 ? 0 : std::acos(p_x));
-}
-_ALWAYS_INLINE_ float acos(float p_x) {
-	return p_x < -1 ? (float)PI : (p_x > 1 ? 0 : std::acos(p_x));
+template <std::floating_point T>
+_ALWAYS_INLINE_ constexpr T tanh(T x) {
+	return std::tanh(x);
 }
 
-_ALWAYS_INLINE_ double atan(double p_x) {
-	return std::atan(p_x);
-}
-_ALWAYS_INLINE_ float atan(float p_x) {
-	return std::atan(p_x);
-}
-
-_ALWAYS_INLINE_ double atan2(double p_y, double p_x) {
-	return std::atan2(p_y, p_x);
-}
-_ALWAYS_INLINE_ float atan2(float p_y, float p_x) {
-	return std::atan2(p_y, p_x);
+template <std::floating_point T>
+_ALWAYS_INLINE_ constexpr T asin(T x) {
+	x = clamp(x, T(-1), T(1));
+	return std::asin(x);
 }
 
-_ALWAYS_INLINE_ double asinh(double p_x) {
-	return std::asinh(p_x);
-}
-_ALWAYS_INLINE_ float asinh(float p_x) {
-	return std::asinh(p_x);
-}
-
-// Always does clamping so always safe to use.
-_ALWAYS_INLINE_ double acosh(double p_x) {
-	return p_x < 1 ? 0 : std::acosh(p_x);
-}
-_ALWAYS_INLINE_ float acosh(float p_x) {
-	return p_x < 1 ? 0 : std::acosh(p_x);
+template <std::floating_point T>
+_ALWAYS_INLINE_ constexpr T acos(T x) {
+	x = clamp(x, T(-1), T(1));
+	return std::acos(x);
 }
 
-// Always does clamping so always safe to use.
-_ALWAYS_INLINE_ double atanh(double p_x) {
-	return p_x <= -1 ? -INF : (p_x >= 1 ? INF : std::atanh(p_x));
-}
-_ALWAYS_INLINE_ float atanh(float p_x) {
-	return p_x <= -1 ? (float)-INF : (p_x >= 1 ? (float)INF : std::atanh(p_x));
+template <std::floating_point T>
+_ALWAYS_INLINE_ constexpr T atan(T x) {
+	return std::atan(x);
 }
 
-_ALWAYS_INLINE_ double sqrt(double p_x) {
-	return std::sqrt(p_x);
-}
-_ALWAYS_INLINE_ float sqrt(float p_x) {
-	return std::sqrt(p_x);
+template <std::floating_point T>
+_ALWAYS_INLINE_ constexpr T atan2(T y, T x) {
+	return std::atan2(y, x);
 }
 
-_ALWAYS_INLINE_ double fmod(double p_x, double p_y) {
-	return std::fmod(p_x, p_y);
-}
-_ALWAYS_INLINE_ float fmod(float p_x, float p_y) {
-	return std::fmod(p_x, p_y);
+template <std::floating_point T>
+_ALWAYS_INLINE_ constexpr T asinh(T x) {
+	return std::asinh(x);
 }
 
-_ALWAYS_INLINE_ double modf(double p_x, double *r_y) {
-	return std::modf(p_x, r_y);
-}
-_ALWAYS_INLINE_ float modf(float p_x, float *r_y) {
-	return std::modf(p_x, r_y);
-}
-
-_ALWAYS_INLINE_ double floor(double p_x) {
-	return std::floor(p_x);
-}
-_ALWAYS_INLINE_ float floor(float p_x) {
-	return std::floor(p_x);
+template <std::floating_point T>
+_ALWAYS_INLINE_ constexpr T acosh(T x) {
+	x = clamp(x, T(1), std::numeric_limits<T>::infinity());
+	return std::acosh(x);
 }
 
-_ALWAYS_INLINE_ double ceil(double p_x) {
-	return std::ceil(p_x);
-}
-_ALWAYS_INLINE_ float ceil(float p_x) {
-	return std::ceil(p_x);
-}
-
-_ALWAYS_INLINE_ double pow(double p_x, double p_y) {
-	return std::pow(p_x, p_y);
-}
-_ALWAYS_INLINE_ float pow(float p_x, float p_y) {
-	return std::pow(p_x, p_y);
+template <std::floating_point T>
+_ALWAYS_INLINE_ constexpr T atanh(T x) {
+	// Not doing explicit checks for perf. reasons, but I am open to discuss this.
+	x = clamp(x, T(-1) + std::numeric_limits<T>::epsilon(),T(1) - std::numeric_limits<T>::epsilon());
+	return std::atanh(x);
 }
 
-_ALWAYS_INLINE_ double log(double p_x) {
-	return std::log(p_x);
-}
-_ALWAYS_INLINE_ float log(float p_x) {
-	return std::log(p_x);
+template <std::floating_point T>
+_ALWAYS_INLINE_ constexpr T sqrt(T x) {
+	return std::sqrt(x);
 }
 
-_ALWAYS_INLINE_ double log1p(double p_x) {
-	return std::log1p(p_x);
-}
-_ALWAYS_INLINE_ float log1p(float p_x) {
-	return std::log1p(p_x);
+template <std::floating_point T, std::convertible_to<T> U>
+_ALWAYS_INLINE_ constexpr T fmod(T x, U y) {
+	return std::fmod(x, y);
 }
 
-_ALWAYS_INLINE_ double log2(double p_x) {
-	return std::log2(p_x);
-}
-_ALWAYS_INLINE_ float log2(float p_x) {
-	return std::log2(p_x);
+template <std::floating_point T>
+_ALWAYS_INLINE_ T modf(T x, T y) {
+	return std::modf(x, y);
 }
 
-_ALWAYS_INLINE_ double exp(double p_x) {
-	return std::exp(p_x);
-}
-_ALWAYS_INLINE_ float exp(float p_x) {
-	return std::exp(p_x);
+template <std::floating_point T>
+_ALWAYS_INLINE_ constexpr T floor(T x) {
+	return std::floor(x);
 }
 
-_ALWAYS_INLINE_ bool is_nan(double p_val) {
-	return std::isnan(p_val);
+template <std::floating_point T>
+_ALWAYS_INLINE_ constexpr T ceil(T x) {
+	return std::ceil(x);
 }
 
-_ALWAYS_INLINE_ bool is_nan(float p_val) {
-	return std::isnan(p_val);
+template <std::floating_point T>
+_ALWAYS_INLINE_ constexpr T pow(T x, T y) {
+	// Requires both params to be the same floating-type.
+	// Cast types manually when needed.
+	return std::pow(x, y);
 }
 
-_ALWAYS_INLINE_ bool is_inf(double p_val) {
-	return std::isinf(p_val);
+template <std::floating_point T>
+_ALWAYS_INLINE_ const T log(T x) {
+	return std::log(x);
 }
 
-_ALWAYS_INLINE_ bool is_inf(float p_val) {
-	return std::isinf(p_val);
+template <std::floating_point T>
+_ALWAYS_INLINE_ constexpr T log1p(T x) {
+	return std::log1p(x);
+}
+
+template <std::floating_point T>
+_ALWAYS_INLINE_ constexpr T log2(T x) {
+	return std::log2(x);
+}
+
+template <std::floating_point T>
+_ALWAYS_INLINE_ constexpr T exp(T x) {
+	return std::exp(x);
+}
+
+template <std::floating_point T>
+_ALWAYS_INLINE_ constexpr bool is_nan(T val) {
+	return std::isnan(val);
+}
+
+template <std::floating_point T>
+_ALWAYS_INLINE_ constexpr bool is_inf(T val) {
+	return std::isinf(val);
 }
 
 // These methods assume (p_num + p_den) doesn't overflow.
