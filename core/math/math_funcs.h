@@ -211,7 +211,7 @@ _ALWAYS_INLINE_ constexpr T division_round_up(T numerator, T denominator) {
 }
 
 template <std::floating_point T>
-_ALWAYS_INLINE_ bool is_finite(T val) {
+_ALWAYS_INLINE_ constexpr bool is_finite(T val) {
 	return std::isfinite(val);
 }
 
