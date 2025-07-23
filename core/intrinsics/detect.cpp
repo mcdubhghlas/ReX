@@ -32,12 +32,6 @@
 
 namespace simd {
 
-#if defined(_MSC_VER)
-    #include <intrin.h> // MSVC
-#else
-    #include <cpuid.h> // GCC/Clang
-#endif
-
 /*
  * Use XGETBV to check if OS has enabled saving/restoring YMM state. This is
  * required for using AVX instructions safely.
