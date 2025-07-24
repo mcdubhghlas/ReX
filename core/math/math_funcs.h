@@ -230,68 +230,67 @@ _ALWAYS_INLINE_ T abs(T value) {
 	}
 }
 
-_ALWAYS_INLINE_ double fposmod(double p_x, double p_y) {
-	double value = fmod(p_x, p_y);
-	if (((value < 0) && (p_y > 0)) || ((value > 0) && (p_y < 0))) {
-		value += p_y;
-	}
-	value += 0.0;
-	return value;
-}
-_ALWAYS_INLINE_ float fposmod(float p_x, float p_y) {
-	float value = fmod(p_x, p_y);
-	if (((value < 0) && (p_y > 0)) || ((value > 0) && (p_y < 0))) {
-		value += p_y;
-	}
-	value += 0.0f;
+template <std::floating_point T>
+_ALWAYS_INLINE_ constexpr T fposmod(T x, T y) {
+	T value = fmod(x, y);
+
+	// Assures result is always positive.
+	value += ((value < T(0)) != (y <T(0))) ? y : T(0);
+
 	return value;
 }
 
-_ALWAYS_INLINE_ double fposmodp(double p_x, double p_y) {
-	double value = fmod(p_x, p_y);
-	if (value < 0) {
-		value += p_y;
-	}
-	value += 0.0;
-	return value;
-}
-_ALWAYS_INLINE_ float fposmodp(float p_x, float p_y) {
-	float value = fmod(p_x, p_y);
-	if (value < 0) {
-		value += p_y;
-	}
-	value += 0.0f;
+template <std::floating_point T>
+_ALWAYS_INLINE_ constexpr T fposmodp(T x, T y) {
+	T value = fmod(x, y);
+
+	value += (value < T(0)) ? y : T(0);
+
 	return value;
 }
 
-_ALWAYS_INLINE_ int64_t posmod(int64_t p_x, int64_t p_y) {
-	ERR_FAIL_COND_V_MSG(p_y == 0, 0, "Division by zero in posmod is undefined. Returning 0 as fallback.");
-	int64_t value = p_x % p_y;
-	if (((value < 0) && (p_y > 0)) || ((value > 0) && (p_y < 0))) {
-		value += p_y;
+// keep overloads and avoid generic templates, otherwise it will slow things down.
+_ALWAYS_INLINE_ constexpr int64_t posmod(int64_t x, int64_t y) {
+	if(y == 0) {
+		// Division by zero undefined. Return 0 as fallback.
+		return 0;
 	}
+
+	int64_t value = x % y;
+
+	value += ((value < 0) != (y < 0)) ? y : 0;
+
 	return value;
 }
 
-_ALWAYS_INLINE_ double deg_to_rad(double p_y) {
-	return p_y * (PI / 180.0);
-}
-_ALWAYS_INLINE_ float deg_to_rad(float p_y) {
-	return p_y * ((float)PI / 180.0f);
+_ALWAYS_INLINE_ constexpr int32_t posmod(int32_t x, int32_t y) {
+    if(y == 0) {
+        // Division by zero undefined. Return 0 as fallback.
+        return 0;
+    }
+
+    int32_t value = x % y;
+
+    value += ((value < 0) != (y < 0)) ? y : 0;
+
+    return value;
 }
 
-_ALWAYS_INLINE_ double rad_to_deg(double p_y) {
-	return p_y * (180.0 / PI);
-}
-_ALWAYS_INLINE_ float rad_to_deg(float p_y) {
-	return p_y * (180.0f / (float)PI);
+template <std::floating_point T>
+_ALWAYS_INLINE_ constexpr T deg_to_rad(T y) {
+	return y * (T(PI) / T(180));
 }
 
-_ALWAYS_INLINE_ double lerp(double p_from, double p_to, double p_weight) {
-	return p_from + (p_to - p_from) * p_weight;
+template <std::floating_point T>
+_ALWAYS_INLINE_ constexpr T rad_to_deg(T y) {
+	return y * (T(180) / T(PI));
 }
-_ALWAYS_INLINE_ float lerp(float p_from, float p_to, float p_weight) {
-	return p_from + (p_to - p_from) * p_weight;
+
+template <std::floating_point T>
+_ALWAYS_INLINE_ constexpr T lerp(T from, T to, T weight) {
+	// TODO: AVX512 crushes float here via clang++
+	// and use scalar for doubles.
+	return from + (to - from) * weight;
 }
 
 _ALWAYS_INLINE_ double cubic_interpolate(double p_from, double p_to, double p_pre, double p_post, double p_weight) {
