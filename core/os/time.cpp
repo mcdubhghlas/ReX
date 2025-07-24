@@ -58,7 +58,7 @@ static const uint8_t MONTH_DAYS_TABLE[2][12] = {
 	uint8_t hour, minute, second;                                            \
 	{                                                                        \
 		/* The time of the day (in seconds since start of day). */           \
-		uint32_t day_clock = Math::posmod(p_unix_time_val, SECONDS_PER_DAY); \
+		uint32_t day_clock = Math::posmod(p_unix_time_val, static_cast<int64_t>(SECONDS_PER_DAY)); \
 		/* On x86 these 4 lines can be optimized to only 2 divisions. */     \
 		second = day_clock % 60;                                             \
 		day_clock /= 60;                                                     \
@@ -202,7 +202,7 @@ Dictionary Time::get_datetime_dict_from_unix_time(int64_t p_unix_time_val) const
 	datetime[MONTH_KEY] = (uint8_t)month;
 	datetime[DAY_KEY] = day;
 	// Unix epoch was a Thursday (day 0 aka 1970-01-01).
-	datetime[WEEKDAY_KEY] = Math::posmod(day_number + WEEKDAY_THURSDAY, 7);
+	datetime[WEEKDAY_KEY] = Math::posmod(static_cast<int>(day_number + WEEKDAY_THURSDAY), 7);
 	datetime[HOUR_KEY] = hour;
 	datetime[MINUTE_KEY] = minute;
 	datetime[SECOND_KEY] = second;
@@ -217,7 +217,7 @@ Dictionary Time::get_date_dict_from_unix_time(int64_t p_unix_time_val) const {
 	datetime[MONTH_KEY] = (uint8_t)month;
 	datetime[DAY_KEY] = day;
 	// Unix epoch was a Thursday (day 0 aka 1970-01-01).
-	datetime[WEEKDAY_KEY] = Math::posmod(day_number + WEEKDAY_THURSDAY, 7);
+	datetime[WEEKDAY_KEY] = Math::posmod(static_cast<int>(day_number + WEEKDAY_THURSDAY), 7);
 
 	return datetime;
 }
@@ -259,7 +259,7 @@ Dictionary Time::get_datetime_dict_from_datetime_string(const String &p_datetime
 	if (p_weekday) {
 		YMD_TO_DAY_NUMBER
 		// Unix epoch was a Thursday (day 0 aka 1970-01-01).
-		dict[WEEKDAY_KEY] = Math::posmod(day_number + WEEKDAY_THURSDAY, 7);
+		dict[WEEKDAY_KEY] = Math::posmod(static_cast<int>(day_number + WEEKDAY_THURSDAY), 7);
 	}
 	dict[HOUR_KEY] = hour;
 	dict[MINUTE_KEY] = minute;
