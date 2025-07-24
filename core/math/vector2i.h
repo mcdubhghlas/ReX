@@ -62,84 +62,73 @@ struct [[nodiscard]] Vector2i {
 		// NOLINTEND(modernize-use-default-member-init)
 	};
 
-	_FORCE_INLINE_ int32_t &operator[](int p_axis) {
-		DEV_ASSERT((unsigned int)p_axis < 2);
-		return coord[p_axis];
-	}
-	_FORCE_INLINE_ const int32_t &operator[](int p_axis) const {
-		DEV_ASSERT((unsigned int)p_axis < 2);
-		return coord[p_axis];
-	}
+	double length() const;
+	int64_t length_squared() const;
+	// TODO limit_length()
 
-	_FORCE_INLINE_ Vector2i::Axis min_axis_index() const {
-		return x < y ? Vector2i::AXIS_X : Vector2i::AXIS_Y;
-	}
+	// TODO zero()
+	Vector2i sign() const;
+	Vector2i abs() const;
 
-	_FORCE_INLINE_ Vector2i::Axis max_axis_index() const {
-		return x < y ? Vector2i::AXIS_Y : Vector2i::AXIS_X;
-	}
 
-	Vector2i min(const Vector2i &p_vector2i) const {
-		return Vector2i(MIN(x, p_vector2i.x), MIN(y, p_vector2i.y));
-	}
+	double distance_to(const Vector2i &p_to) const;
+	int64_t distance_squared_to(const Vector2i &p_to) const;
 
-	Vector2i mini(int32_t p_scalar) const {
-		return Vector2i(MIN(x, p_scalar), MIN(y, p_scalar));
-	}
 
-	Vector2i max(const Vector2i &p_vector2i) const {
-		return Vector2i(MAX(x, p_vector2i.x), MAX(y, p_vector2i.y));
-	}
+	_FORCE_INLINE_ Vector2i::Axis min_axis_index() const;
+	_FORCE_INLINE_ Vector2i::Axis max_axis_index() const;
 
-	Vector2i maxi(int32_t p_scalar) const {
-		return Vector2i(MAX(x, p_scalar), MAX(y, p_scalar));
-	}
+	Vector2i min(const Vector2i &p_vector2i) const;
+	Vector2i mini(int32_t p_scalar) const;
+	Vector2i max(const Vector2i &p_vector2i) const;
+	Vector2i maxi(int32_t p_scalar) const;
+	Vector2i clamp(const Vector2i &p_min, const Vector2i &p_max) const;
+	Vector2i clampi(int32_t p_min, int32_t p_max) const;
+	// TODO snap()
+	// TODO snapi()
+	Vector2i snapped(const Vector2i &p_step) const;
+	Vector2i snappedi(int32_t p_step) const;
 
-	double distance_to(const Vector2i &p_to) const {
-		return (p_to - *this).length();
-	}
+	real_t aspect() const;
 
-	int64_t distance_squared_to(const Vector2i &p_to) const {
-		return (p_to - *this).length_squared();
-	}
 
+	_FORCE_INLINE_ int32_t &operator[](int p_axis);
+	_FORCE_INLINE_ const int32_t &operator[](int p_axis) const;
+
+	// Vectors
 	constexpr Vector2i operator+(const Vector2i &p_v) const;
 	constexpr void operator+=(const Vector2i &p_v);
+
 	constexpr Vector2i operator-(const Vector2i &p_v) const;
 	constexpr void operator-=(const Vector2i &p_v);
-	constexpr Vector2i operator*(const Vector2i &p_v1) const;
 
+	constexpr Vector2i operator*(const Vector2i &p_v1) const;
+	// TODO operator*=()
+
+	constexpr Vector2i operator/(const Vector2i &p_v1) const;
+	// TODO operator/=()
+
+	constexpr Vector2i operator%(const Vector2i &p_v1) const;
+	// TODO operator%=()
+
+	// Scalars
 	constexpr Vector2i operator*(int32_t p_rvalue) const;
 	constexpr void operator*=(int32_t p_rvalue);
 
-	constexpr Vector2i operator/(const Vector2i &p_v1) const;
 	constexpr Vector2i operator/(int32_t p_rvalue) const;
 	constexpr void operator/=(int32_t p_rvalue);
 
-	constexpr Vector2i operator%(const Vector2i &p_v1) const;
 	constexpr Vector2i operator%(int32_t p_rvalue) const;
 	constexpr void operator%=(int32_t p_rvalue);
 
 	constexpr Vector2i operator-() const;
-	constexpr bool operator<(const Vector2i &p_vec2) const { return (x == p_vec2.x) ? (y < p_vec2.y) : (x < p_vec2.x); }
-	constexpr bool operator>(const Vector2i &p_vec2) const { return (x == p_vec2.x) ? (y > p_vec2.y) : (x > p_vec2.x); }
-
-	constexpr bool operator<=(const Vector2i &p_vec2) const { return x == p_vec2.x ? (y <= p_vec2.y) : (x < p_vec2.x); }
-	constexpr bool operator>=(const Vector2i &p_vec2) const { return x == p_vec2.x ? (y >= p_vec2.y) : (x > p_vec2.x); }
 
 	constexpr bool operator==(const Vector2i &p_vec2) const;
 	constexpr bool operator!=(const Vector2i &p_vec2) const;
-
-	int64_t length_squared() const;
-	double length() const;
-
-	real_t aspect() const { return width / (real_t)height; }
-	Vector2i sign() const { return Vector2i(SIGN(x), SIGN(y)); }
-	Vector2i abs() const { return Vector2i(Math::abs(x), Math::abs(y)); }
-	Vector2i clamp(const Vector2i &p_min, const Vector2i &p_max) const;
-	Vector2i clampi(int32_t p_min, int32_t p_max) const;
-	Vector2i snapped(const Vector2i &p_step) const;
-	Vector2i snappedi(int32_t p_step) const;
+	constexpr bool operator<(const Vector2i &p_vec2) const;
+	constexpr bool operator>(const Vector2i &p_vec2) const;
+	constexpr bool operator<=(const Vector2i &p_vec2) const;
+	constexpr bool operator>=(const Vector2i &p_vec2) const;
 
 	operator String() const;
 	operator Vector2() const;
@@ -152,95 +141,15 @@ struct [[nodiscard]] Vector2i {
 	// NOLINTEND(cppcoreguidelines-pro-type-member-init)
 };
 
-constexpr Vector2i Vector2i::operator+(const Vector2i &p_v) const {
-	return Vector2i(x + p_v.x, y + p_v.y);
-}
-
-constexpr void Vector2i::operator+=(const Vector2i &p_v) {
-	x += p_v.x;
-	y += p_v.y;
-}
-
-constexpr Vector2i Vector2i::operator-(const Vector2i &p_v) const {
-	return Vector2i(x - p_v.x, y - p_v.y);
-}
-
-constexpr void Vector2i::operator-=(const Vector2i &p_v) {
-	x -= p_v.x;
-	y -= p_v.y;
-}
-
-constexpr Vector2i Vector2i::operator*(const Vector2i &p_v1) const {
-	return Vector2i(x * p_v1.x, y * p_v1.y);
-}
-
-constexpr Vector2i Vector2i::operator*(int32_t p_rvalue) const {
-	return Vector2i(x * p_rvalue, y * p_rvalue);
-}
-
-constexpr void Vector2i::operator*=(int32_t p_rvalue) {
-	x *= p_rvalue;
-	y *= p_rvalue;
-}
-
-constexpr Vector2i Vector2i::operator/(const Vector2i &p_v1) const {
-	return Vector2i(x / p_v1.x, y / p_v1.y);
-}
-
-constexpr Vector2i Vector2i::operator/(int32_t p_rvalue) const {
-	return Vector2i(x / p_rvalue, y / p_rvalue);
-}
-
-constexpr void Vector2i::operator/=(int32_t p_rvalue) {
-	x /= p_rvalue;
-	y /= p_rvalue;
-}
-
-constexpr Vector2i Vector2i::operator%(const Vector2i &p_v1) const {
-	return Vector2i(x % p_v1.x, y % p_v1.y);
-}
-
-constexpr Vector2i Vector2i::operator%(int32_t p_rvalue) const {
-	return Vector2i(x % p_rvalue, y % p_rvalue);
-}
-
-constexpr void Vector2i::operator%=(int32_t p_rvalue) {
-	x %= p_rvalue;
-	y %= p_rvalue;
-}
-
-constexpr Vector2i Vector2i::operator-() const {
-	return Vector2i(-x, -y);
-}
-
-constexpr bool Vector2i::operator==(const Vector2i &p_vec2) const {
-	return x == p_vec2.x && y == p_vec2.y;
-}
-
-constexpr bool Vector2i::operator!=(const Vector2i &p_vec2) const {
-	return x != p_vec2.x || y != p_vec2.y;
-}
 
 // Multiplication operators required to workaround issues with LLVM using implicit conversion.
+constexpr Vector2i operator*(int32_t p_scalar, const Vector2i &p_vector);
+constexpr Vector2i operator*(int64_t p_scalar, const Vector2i &p_vector);
+constexpr Vector2i operator*(float p_scalar, const Vector2i &p_vector);
+constexpr Vector2i operator*(double p_scalar, const Vector2i &p_vector);
 
-constexpr Vector2i operator*(int32_t p_scalar, const Vector2i &p_vector) {
-	return p_vector * p_scalar;
-}
-
-constexpr Vector2i operator*(int64_t p_scalar, const Vector2i &p_vector) {
-	return p_vector * p_scalar;
-}
-
-constexpr Vector2i operator*(float p_scalar, const Vector2i &p_vector) {
-	return p_vector * p_scalar;
-}
-
-constexpr Vector2i operator*(double p_scalar, const Vector2i &p_vector) {
-	return p_vector * p_scalar;
-}
-
-typedef Vector2i Size2i;
-typedef Vector2i Point2i;
+using Size2i = Vector2i;
+using Point2i = Vector2i;
 
 template <>
 struct is_zero_constructible<Vector2i> : std::true_type {};

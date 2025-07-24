@@ -35,6 +35,35 @@
 #include "core/math/vector4.h"
 #include "core/string/ustring.h"
 
+double Vector4i::length() const {
+	return Math::sqrt((double)length_squared());
+}
+
+int64_t Vector4i::length_squared() const {
+	return x * (int64_t)x + y * (int64_t)y + z * (int64_t)z + w * (int64_t)w;
+}
+
+void Vector4i::zero() {
+	x = y = z = w = 0;
+}
+
+Vector4i Vector4i::sign() const {
+	return Vector4i(SIGN(x), SIGN(y), SIGN(z), SIGN(w));
+}
+
+Vector4i Vector4i::abs() const {
+	return Vector4i(Math::abs(x), Math::abs(y), Math::abs(z), Math::abs(w));
+}
+
+double Vector4i::distance_to(const Vector4i &p_to) const {
+	return (p_to - *this).length();
+}
+
+int64_t Vector4i::distance_squared_to(const Vector4i &p_to) const {
+	return (p_to - *this).length_squared();
+}
+
+
 Vector4i::Axis Vector4i::min_axis_index() const {
 	uint32_t min_index = 0;
 	int32_t min_value = x;
@@ -57,6 +86,20 @@ Vector4i::Axis Vector4i::max_axis_index() const {
 		}
 	}
 	return Vector4i::Axis(max_index);
+}
+
+
+Vector4i Vector4i::min(const Vector4i &p_vector4i) const {
+	return Vector4i(MIN(x, p_vector4i.x), MIN(y, p_vector4i.y), MIN(z, p_vector4i.z), MIN(w, p_vector4i.w));
+}
+Vector4i Vector4i::mini(int32_t p_scalar) const {
+	return Vector4i(MIN(x, p_scalar), MIN(y, p_scalar), MIN(z, p_scalar), MIN(w, p_scalar));
+}
+Vector4i Vector4i::max(const Vector4i &p_vector4i) const {
+	return Vector4i(MAX(x, p_vector4i.x), MAX(y, p_vector4i.y), MAX(z, p_vector4i.z), MAX(w, p_vector4i.w));
+}
+Vector4i Vector4i::maxi(int32_t p_scalar) const {
+	return Vector4i(MAX(x, p_scalar), MAX(y, p_scalar), MAX(z, p_scalar), MAX(w, p_scalar));
 }
 
 Vector4i Vector4i::clamp(const Vector4i &p_min, const Vector4i &p_max) const {
@@ -91,6 +134,187 @@ Vector4i Vector4i::snappedi(int32_t p_step) const {
 			Math::snapped(w, p_step));
 }
 
+
+
+
+
+_FORCE_INLINE_ const int32_t &Vector4i::operator[](int p_axis) const {
+	DEV_ASSERT((unsigned int)p_axis < 4);
+	return coord[p_axis];
+}
+
+_FORCE_INLINE_ int32_t &Vector4i::operator[](int p_axis) {
+	DEV_ASSERT((unsigned int)p_axis < 4);
+	return coord[p_axis];
+}
+
+
+constexpr Vector4i Vector4i::operator+(const Vector4i &p_v) const {
+	return Vector4i(x + p_v.x, y + p_v.y, z + p_v.z, w + p_v.w);
+}
+constexpr Vector4i &Vector4i::operator+=(const Vector4i &p_v) {
+	x += p_v.x;
+	y += p_v.y;
+	z += p_v.z;
+	w += p_v.w;
+	return *this;
+}
+
+constexpr Vector4i Vector4i::operator-(const Vector4i &p_v) const {
+	return Vector4i(x - p_v.x, y - p_v.y, z - p_v.z, w - p_v.w);
+}
+constexpr Vector4i &Vector4i::operator-=(const Vector4i &p_v) {
+	x -= p_v.x;
+	y -= p_v.y;
+	z -= p_v.z;
+	w -= p_v.w;
+	return *this;
+}
+
+constexpr Vector4i Vector4i::operator*(const Vector4i &p_v) const {
+	return Vector4i(x * p_v.x, y * p_v.y, z * p_v.z, w * p_v.w);
+}
+constexpr Vector4i &Vector4i::operator*=(const Vector4i &p_v) {
+	x *= p_v.x;
+	y *= p_v.y;
+	z *= p_v.z;
+	w *= p_v.w;
+	return *this;
+}
+
+constexpr Vector4i Vector4i::operator/(const Vector4i &p_v) const {
+	return Vector4i(x / p_v.x, y / p_v.y, z / p_v.z, w / p_v.w);
+}
+constexpr Vector4i &Vector4i::operator/=(const Vector4i &p_v) {
+	x /= p_v.x;
+	y /= p_v.y;
+	z /= p_v.z;
+	w /= p_v.w;
+	return *this;
+}
+
+constexpr Vector4i Vector4i::operator%(const Vector4i &p_v) const {
+	return Vector4i(x % p_v.x, y % p_v.y, z % p_v.z, w % p_v.w);
+}
+constexpr Vector4i &Vector4i::operator%=(const Vector4i &p_v) {
+	x %= p_v.x;
+	y %= p_v.y;
+	z %= p_v.z;
+	w %= p_v.w;
+	return *this;
+}
+
+constexpr Vector4i Vector4i::operator*(int32_t p_scalar) const {
+	return Vector4i(x * p_scalar, y * p_scalar, z * p_scalar, w * p_scalar);
+}
+constexpr Vector4i &Vector4i::operator*=(int32_t p_scalar) {
+	x *= p_scalar;
+	y *= p_scalar;
+	z *= p_scalar;
+	w *= p_scalar;
+	return *this;
+}
+
+constexpr Vector4i Vector4i::operator/(int32_t p_scalar) const {
+	return Vector4i(x / p_scalar, y / p_scalar, z / p_scalar, w / p_scalar);
+}
+constexpr Vector4i &Vector4i::operator/=(int32_t p_scalar) {
+	x /= p_scalar;
+	y /= p_scalar;
+	z /= p_scalar;
+	w /= p_scalar;
+	return *this;
+}
+
+constexpr Vector4i Vector4i::operator%(int32_t p_scalar) const {
+	return Vector4i(x % p_scalar, y % p_scalar, z % p_scalar, w % p_scalar);
+}
+constexpr Vector4i &Vector4i::operator%=(int32_t p_scalar) {
+	x %= p_scalar;
+	y %= p_scalar;
+	z %= p_scalar;
+	w %= p_scalar;
+	return *this;
+}
+
+
+constexpr Vector4i Vector4i::operator-() const {
+	return Vector4i(-x, -y, -z, -w);
+}
+
+constexpr bool Vector4i::operator==(const Vector4i &p_v) const {
+	return (x == p_v.x && y == p_v.y && z == p_v.z && w == p_v.w);
+}
+
+constexpr bool Vector4i::operator!=(const Vector4i &p_v) const {
+	return (x != p_v.x || y != p_v.y || z != p_v.z || w != p_v.w);
+}
+
+constexpr bool Vector4i::operator<(const Vector4i &p_v) const {
+	if (x == p_v.x) {
+		if (y == p_v.y) {
+			if (z == p_v.z) {
+				return w < p_v.w;
+			} else {
+				return z < p_v.z;
+			}
+		} else {
+			return y < p_v.y;
+		}
+	} else {
+		return x < p_v.x;
+	}
+}
+
+constexpr bool Vector4i::operator>(const Vector4i &p_v) const {
+	if (x == p_v.x) {
+		if (y == p_v.y) {
+			if (z == p_v.z) {
+				return w > p_v.w;
+			} else {
+				return z > p_v.z;
+			}
+		} else {
+			return y > p_v.y;
+		}
+	} else {
+		return x > p_v.x;
+	}
+}
+
+constexpr bool Vector4i::operator<=(const Vector4i &p_v) const {
+	if (x == p_v.x) {
+		if (y == p_v.y) {
+			if (z == p_v.z) {
+				return w <= p_v.w;
+			} else {
+				return z < p_v.z;
+			}
+		} else {
+			return y < p_v.y;
+		}
+	} else {
+		return x < p_v.x;
+	}
+}
+
+constexpr bool Vector4i::operator>=(const Vector4i &p_v) const {
+	if (x == p_v.x) {
+		if (y == p_v.y) {
+			if (z == p_v.z) {
+				return w >= p_v.w;
+			} else {
+				return z > p_v.z;
+			}
+		} else {
+			return y > p_v.y;
+		}
+	} else {
+		return x > p_v.x;
+	}
+}
+
+
 Vector4i::operator String() const {
 	return "(" + itos(x) + ", " + itos(y) + ", " + itos(z) + ", " + itos(w) + ")";
 }
@@ -107,3 +331,23 @@ Vector4i::Vector4i(const Vector4 &p_vec4) {
 }
 
 static_assert(sizeof(Vector4i) == 4 * sizeof(int32_t));
+
+
+
+
+
+constexpr Vector4i operator*(int32_t p_scalar, const Vector4i &p_vector) {
+	return p_vector * p_scalar;
+}
+
+constexpr Vector4i operator*(int64_t p_scalar, const Vector4i &p_vector) {
+	return p_vector * p_scalar;
+}
+
+constexpr Vector4i operator*(float p_scalar, const Vector4i &p_vector) {
+	return p_vector * p_scalar;
+}
+
+constexpr Vector4i operator*(double p_scalar, const Vector4i &p_vector) {
+	return p_vector * p_scalar;
+}
