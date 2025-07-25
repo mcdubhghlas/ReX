@@ -34,6 +34,7 @@
 
 #include "core/error/error_macros.h"
 #include "core/math/math_defs.h"
+#include "core/math/math_funcs.h"
 #include "core/typedefs.h"
 
 class String;
@@ -61,82 +62,91 @@ struct [[nodiscard]] Vector4 {
 		// NOLINTEND(modernize-use-default-member-init)
 	};
 
-	_FORCE_INLINE_ real_t &operator[](int p_axis) {
-		DEV_ASSERT((unsigned int)p_axis < 4);
-		return coord[p_axis];
-	}
-	_FORCE_INLINE_ const real_t &operator[](int p_axis) const {
-		DEV_ASSERT((unsigned int)p_axis < 4);
-		return coord[p_axis];
-	}
-
-	Vector4::Axis min_axis_index() const;
-	Vector4::Axis max_axis_index() const;
-
-	Vector4 min(const Vector4 &p_vector4) const {
-		return Vector4(MIN(x, p_vector4.x), MIN(y, p_vector4.y), MIN(z, p_vector4.z), MIN(w, p_vector4.w));
-	}
-
-	Vector4 minf(real_t p_scalar) const {
-		return Vector4(MIN(x, p_scalar), MIN(y, p_scalar), MIN(z, p_scalar), MIN(w, p_scalar));
-	}
-
-	Vector4 max(const Vector4 &p_vector4) const {
-		return Vector4(MAX(x, p_vector4.x), MAX(y, p_vector4.y), MAX(z, p_vector4.z), MAX(w, p_vector4.w));
-	}
-
-	Vector4 maxf(real_t p_scalar) const {
-		return Vector4(MAX(x, p_scalar), MAX(y, p_scalar), MAX(z, p_scalar), MAX(w, p_scalar));
-	}
-
-	_FORCE_INLINE_ real_t length_squared() const;
-	bool is_equal_approx(const Vector4 &p_vec4) const;
-	bool is_zero_approx() const;
-	bool is_same(const Vector4 &p_vec4) const;
-	bool is_finite() const;
 	real_t length() const;
+	_FORCE_INLINE_ real_t length_squared() const;
+	// TODO limit_length()
+
+	// TODO zero()
+	Vector4 sign() const;
+	Vector4 abs() const;
+	Vector4 floor() const;
+	Vector4 ceil() const;
+	Vector4 round() const;
+	bool is_finite() const;
+
 	void normalize();
 	Vector4 normalized() const;
 	bool is_normalized() const;
+
+	// These are probably not included for a reason
+	// Leaving up to Mcdub's discretion
+	// TODO angle()
+	// TODO rotate()
+	// TODO rotated()
+	// TODO angle_to()
+	// TODO signed_angle_to()
+	// TODO angle_to_point()
+	// TODO from_angle()
 
 	real_t distance_to(const Vector4 &p_to) const;
 	real_t distance_squared_to(const Vector4 &p_to) const;
 	Vector4 direction_to(const Vector4 &p_to) const;
 
-	Vector4 abs() const;
-	Vector4 sign() const;
-	Vector4 floor() const;
-	Vector4 ceil() const;
-	Vector4 round() const;
+
+	_FORCE_INLINE_ real_t dot(const Vector4 &p_vec4) const;
+	// TODO cross()
+
+	Vector4 inverse() const;
+	Vector4::Axis min_axis_index() const;
+	Vector4::Axis max_axis_index() const;
+
+
 	Vector4 lerp(const Vector4 &p_to, real_t p_weight) const;
+	// TODO slerp
 	Vector4 cubic_interpolate(const Vector4 &p_b, const Vector4 &p_pre_a, const Vector4 &p_post_b, real_t p_weight) const;
 	Vector4 cubic_interpolate_in_time(const Vector4 &p_b, const Vector4 &p_pre_a, const Vector4 &p_post_b, real_t p_weight, real_t p_b_t, real_t p_pre_a_t, real_t p_post_b_t) const;
 
 	Vector4 posmod(real_t p_mod) const;
 	Vector4 posmodv(const Vector4 &p_modv) const;
+
+	Vector4 min(const Vector4 &p_vector4) const;
+	Vector4 minf(real_t p_scalar) const;
+	Vector4 max(const Vector4 &p_vector4) const;
+	Vector4 maxf(real_t p_scalar) const;
+	Vector4 clamp(const Vector4 &p_min, const Vector4 &p_max) const;
+	Vector4 clampf(real_t p_min, real_t p_max) const;
 	void snap(const Vector4 &p_step);
 	void snapf(real_t p_step);
 	Vector4 snapped(const Vector4 &p_step) const;
 	Vector4 snappedf(real_t p_step) const;
-	Vector4 clamp(const Vector4 &p_min, const Vector4 &p_max) const;
-	Vector4 clampf(real_t p_min, real_t p_max) const;
 
-	Vector4 inverse() const;
-	_FORCE_INLINE_ real_t dot(const Vector4 &p_vec4) const;
+	bool is_equal_approx(const Vector4 &p_vec4) const;
+	bool is_zero_approx() const;
+	bool is_same(const Vector4 &p_vec4) const;
 
-	constexpr void operator+=(const Vector4 &p_vec4);
-	constexpr void operator-=(const Vector4 &p_vec4);
-	constexpr void operator*=(const Vector4 &p_vec4);
-	constexpr void operator/=(const Vector4 &p_vec4);
-	constexpr void operator*=(real_t p_s);
-	constexpr void operator/=(real_t p_s);
+	_FORCE_INLINE_ real_t &operator[](int p_axis);
+	_FORCE_INLINE_ const real_t &operator[](int p_axis) const;
+
 	constexpr Vector4 operator+(const Vector4 &p_vec4) const;
+	constexpr void operator+=(const Vector4 &p_vec4);
+
 	constexpr Vector4 operator-(const Vector4 &p_vec4) const;
+	constexpr void operator-=(const Vector4 &p_vec4);
+
 	constexpr Vector4 operator*(const Vector4 &p_vec4) const;
+	constexpr void operator*=(const Vector4 &p_vec4);
+
 	constexpr Vector4 operator/(const Vector4 &p_vec4) const;
-	constexpr Vector4 operator-() const;
+	constexpr void operator/=(const Vector4 &p_vec4);
+
 	constexpr Vector4 operator*(real_t p_s) const;
+	constexpr void operator*=(real_t p_s);
+
 	constexpr Vector4 operator/(real_t p_s) const;
+	constexpr void operator/=(real_t p_s);
+
+
+	constexpr Vector4 operator-() const;
 
 	constexpr bool operator==(const Vector4 &p_vec4) const;
 	constexpr bool operator!=(const Vector4 &p_vec4) const;
@@ -154,14 +164,43 @@ struct [[nodiscard]] Vector4 {
 			x(p_x), y(p_y), z(p_z), w(p_w) {}
 };
 
-real_t Vector4::dot(const Vector4 &p_vec4) const {
-	return x * p_vec4.x + y * p_vec4.y + z * p_vec4.z + w * p_vec4.w;
+constexpr Vector4 operator*(float p_scalar, const Vector4 &p_vec) {
+	return p_vec * p_scalar;
+}
+constexpr Vector4 operator*(double p_scalar, const Vector4 &p_vec) {
+	return p_vec * p_scalar;
+}
+constexpr Vector4 operator*(int32_t p_scalar, const Vector4 &p_vec) {
+	return p_vec * p_scalar;
+}
+constexpr Vector4 operator*(int64_t p_scalar, const Vector4 &p_vec) {
+	return p_vec * p_scalar;
 }
 
-real_t Vector4::length_squared() const {
+_FORCE_INLINE_ real_t Vector4::length() const {
+	return Math::sqrt(length_squared());
+}
+_FORCE_INLINE_ real_t Vector4::length_squared() const {
 	return dot(*this);
 }
 
+_FORCE_INLINE_ real_t Vector4::dot(const Vector4 &p_vec4) const {
+	return x * p_vec4.x + y * p_vec4.y + z * p_vec4.z + w * p_vec4.w;
+}
+
+
+_FORCE_INLINE_ real_t &Vector4::operator[](int p_axis) {
+	DEV_ASSERT((unsigned int)p_axis < 4);
+	return coord[p_axis];
+}
+_FORCE_INLINE_ const real_t &Vector4::operator[](int p_axis) const {
+	DEV_ASSERT((unsigned int)p_axis < 4);
+	return coord[p_axis];
+}
+
+constexpr Vector4 Vector4::operator+(const Vector4 &p_vec4) const {
+	return Vector4(x + p_vec4.x, y + p_vec4.y, z + p_vec4.z, w + p_vec4.w);
+}
 constexpr void Vector4::operator+=(const Vector4 &p_vec4) {
 	x += p_vec4.x;
 	y += p_vec4.y;
@@ -169,6 +208,9 @@ constexpr void Vector4::operator+=(const Vector4 &p_vec4) {
 	w += p_vec4.w;
 }
 
+constexpr Vector4 Vector4::operator-(const Vector4 &p_vec4) const {
+	return Vector4(x - p_vec4.x, y - p_vec4.y, z - p_vec4.z, w - p_vec4.w);
+}
 constexpr void Vector4::operator-=(const Vector4 &p_vec4) {
 	x -= p_vec4.x;
 	y -= p_vec4.y;
@@ -176,6 +218,9 @@ constexpr void Vector4::operator-=(const Vector4 &p_vec4) {
 	w -= p_vec4.w;
 }
 
+constexpr Vector4 Vector4::operator*(const Vector4 &p_vec4) const {
+	return Vector4(x * p_vec4.x, y * p_vec4.y, z * p_vec4.z, w * p_vec4.w);
+}
 constexpr void Vector4::operator*=(const Vector4 &p_vec4) {
 	x *= p_vec4.x;
 	y *= p_vec4.y;
@@ -183,11 +228,18 @@ constexpr void Vector4::operator*=(const Vector4 &p_vec4) {
 	w *= p_vec4.w;
 }
 
+constexpr Vector4 Vector4::operator/(const Vector4 &p_vec4) const {
+	return Vector4(x / p_vec4.x, y / p_vec4.y, z / p_vec4.z, w / p_vec4.w);
+}
 constexpr void Vector4::operator/=(const Vector4 &p_vec4) {
 	x /= p_vec4.x;
 	y /= p_vec4.y;
 	z /= p_vec4.z;
 	w /= p_vec4.w;
+}
+
+constexpr Vector4 Vector4::operator*(real_t p_s) const {
+	return Vector4(x * p_s, y * p_s, z * p_s, w * p_s);
 }
 constexpr void Vector4::operator*=(real_t p_s) {
 	x *= p_s;
@@ -196,37 +248,14 @@ constexpr void Vector4::operator*=(real_t p_s) {
 	w *= p_s;
 }
 
+constexpr Vector4 Vector4::operator/(real_t p_s) const {
+	return *this * (1 / p_s);
+}
 constexpr void Vector4::operator/=(real_t p_s) {
 	*this *= (1 / p_s);
 }
 
-constexpr Vector4 Vector4::operator+(const Vector4 &p_vec4) const {
-	return Vector4(x + p_vec4.x, y + p_vec4.y, z + p_vec4.z, w + p_vec4.w);
-}
 
-constexpr Vector4 Vector4::operator-(const Vector4 &p_vec4) const {
-	return Vector4(x - p_vec4.x, y - p_vec4.y, z - p_vec4.z, w - p_vec4.w);
-}
-
-constexpr Vector4 Vector4::operator*(const Vector4 &p_vec4) const {
-	return Vector4(x * p_vec4.x, y * p_vec4.y, z * p_vec4.z, w * p_vec4.w);
-}
-
-constexpr Vector4 Vector4::operator/(const Vector4 &p_vec4) const {
-	return Vector4(x / p_vec4.x, y / p_vec4.y, z / p_vec4.z, w / p_vec4.w);
-}
-
-constexpr Vector4 Vector4::operator-() const {
-	return Vector4(-x, -y, -z, -w);
-}
-
-constexpr Vector4 Vector4::operator*(real_t p_s) const {
-	return Vector4(x * p_s, y * p_s, z * p_s, w * p_s);
-}
-
-constexpr Vector4 Vector4::operator/(real_t p_s) const {
-	return *this * (1 / p_s);
-}
 
 constexpr bool Vector4::operator==(const Vector4 &p_vec4) const {
 	return x == p_vec4.x && y == p_vec4.y && z == p_vec4.z && w == p_vec4.w;
@@ -288,20 +317,9 @@ constexpr bool Vector4::operator>=(const Vector4 &p_v) const {
 	return x > p_v.x;
 }
 
-constexpr Vector4 operator*(float p_scalar, const Vector4 &p_vec) {
-	return p_vec * p_scalar;
-}
 
-constexpr Vector4 operator*(double p_scalar, const Vector4 &p_vec) {
-	return p_vec * p_scalar;
-}
-
-constexpr Vector4 operator*(int32_t p_scalar, const Vector4 &p_vec) {
-	return p_vec * p_scalar;
-}
-
-constexpr Vector4 operator*(int64_t p_scalar, const Vector4 &p_vec) {
-	return p_vec * p_scalar;
+constexpr Vector4 Vector4::operator-() const {
+	return Vector4(-x, -y, -z, -w);
 }
 
 template <>

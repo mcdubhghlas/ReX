@@ -35,6 +35,44 @@
 #include "core/math/vector2.h"
 #include "core/string/ustring.h"
 
+
+double Vector2i::length() const {
+	return Math::sqrt((double)length_squared());
+}
+
+int64_t Vector2i::length_squared() const {
+	return x * (int64_t)x + y * (int64_t)y;
+}
+Vector2i Vector2i::sign() const { return Vector2i(SIGN(x), SIGN(y)); }
+Vector2i Vector2i::abs() const { return Vector2i(Math::abs(x), Math::abs(y)); }
+
+double Vector2i::distance_to(const Vector2i &p_to) const {
+	return (p_to - *this).length();
+}
+
+int64_t Vector2i::distance_squared_to(const Vector2i &p_to) const {
+	return (p_to - *this).length_squared();
+}
+
+
+
+
+Vector2i Vector2i::min(const Vector2i &p_vector2i) const {
+	return Vector2i(MIN(x, p_vector2i.x), MIN(y, p_vector2i.y));
+}
+
+Vector2i Vector2i::mini(int32_t p_scalar) const {
+	return Vector2i(MIN(x, p_scalar), MIN(y, p_scalar));
+}
+
+Vector2i Vector2i::max(const Vector2i &p_vector2i) const {
+	return Vector2i(MAX(x, p_vector2i.x), MAX(y, p_vector2i.y));
+}
+
+Vector2i Vector2i::maxi(int32_t p_scalar) const {
+	return Vector2i(MAX(x, p_scalar), MAX(y, p_scalar));
+}
+
 Vector2i Vector2i::clamp(const Vector2i &p_min, const Vector2i &p_max) const {
 	return Vector2i(
 			CLAMP(x, p_min.x, p_max.x),
@@ -59,13 +97,10 @@ Vector2i Vector2i::snappedi(int32_t p_step) const {
 			Math::snapped(y, p_step));
 }
 
-int64_t Vector2i::length_squared() const {
-	return x * (int64_t)x + y * (int64_t)y;
-}
+real_t Vector2i::aspect() const { return width / (real_t)height; }
 
-double Vector2i::length() const {
-	return Math::sqrt((double)length_squared());
-}
+
+
 
 Vector2i::operator String() const {
 	return "(" + itos(x) + ", " + itos(y) + ")";
@@ -74,3 +109,6 @@ Vector2i::operator String() const {
 Vector2i::operator Vector2() const {
 	return Vector2((int32_t)x, (int32_t)y);
 }
+
+
+

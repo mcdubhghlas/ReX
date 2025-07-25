@@ -37,6 +37,20 @@
 #include "core/math/vector3i.h"
 #include "core/string/ustring.h"
 
+
+
+Vector3 Vector3::limit_length(real_t p_len) const {
+	const real_t l = length();
+	Vector3 v = *this;
+	if (l > 0 && p_len < l) {
+		v /= l;
+		v *= p_len;
+	}
+
+	return v;
+}
+
+
 void Vector3::rotate(const Vector3 &p_axis, real_t p_angle) {
 	*this = Basis(p_axis, p_angle).xform(*this);
 }
@@ -45,6 +59,37 @@ Vector3 Vector3::rotated(const Vector3 &p_axis, real_t p_angle) const {
 	Vector3 r = *this;
 	r.rotate(p_axis, p_angle);
 	return r;
+}
+
+
+
+
+
+
+
+
+Vector3 Vector3::move_toward(const Vector3 &p_to, real_t p_delta) const {
+	Vector3 v = *this;
+	Vector3 vd = p_to - v;
+	real_t len = vd.length();
+	return len <= p_delta || len < (real_t)CMP_EPSILON ? p_to : v + vd / len * p_delta;
+}
+
+
+
+
+
+Vector3 Vector3::min(const Vector3 &p_vector3) const {
+	return Vector3(MIN(x, p_vector3.x), MIN(y, p_vector3.y), MIN(z, p_vector3.z));
+}
+Vector3 Vector3::minf(real_t p_scalar) const {
+	return Vector3(MIN(x, p_scalar), MIN(y, p_scalar), MIN(z, p_scalar));
+}
+Vector3 Vector3::max(const Vector3 &p_vector3) const {
+	return Vector3(MAX(x, p_vector3.x), MAX(y, p_vector3.y), MAX(z, p_vector3.z));
+}
+Vector3 Vector3::maxf(real_t p_scalar) const {
+	return Vector3(MAX(x, p_scalar), MAX(y, p_scalar), MAX(z, p_scalar));
 }
 
 Vector3 Vector3::clamp(const Vector3 &p_min, const Vector3 &p_max) const {
@@ -85,23 +130,9 @@ Vector3 Vector3::snappedf(real_t p_step) const {
 	return v;
 }
 
-Vector3 Vector3::limit_length(real_t p_len) const {
-	const real_t l = length();
-	Vector3 v = *this;
-	if (l > 0 && p_len < l) {
-		v /= l;
-		v *= p_len;
-	}
 
-	return v;
-}
 
-Vector3 Vector3::move_toward(const Vector3 &p_to, real_t p_delta) const {
-	Vector3 v = *this;
-	Vector3 vd = p_to - v;
-	real_t len = vd.length();
-	return len <= p_delta || len < (real_t)CMP_EPSILON ? p_to : v + vd / len * p_delta;
-}
+
 
 Vector2 Vector3::octahedron_encode() const {
 	Vector3 n = *this;
@@ -169,6 +200,8 @@ bool Vector3::is_zero_approx() const {
 bool Vector3::is_finite() const {
 	return Math::is_finite(x) && Math::is_finite(y) && Math::is_finite(z);
 }
+
+
 
 Vector3::operator String() const {
 	return "(" + String::num_real(x, true) + ", " + String::num_real(y, true) + ", " + String::num_real(z, true) + ")";

@@ -35,6 +35,11 @@
 #include "core/math/vector4.h"
 #include "core/string/ustring.h"
 
+
+
+
+
+
 Vector4i::Axis Vector4i::min_axis_index() const {
 	uint32_t min_index = 0;
 	int32_t min_value = x;
@@ -57,6 +62,20 @@ Vector4i::Axis Vector4i::max_axis_index() const {
 		}
 	}
 	return Vector4i::Axis(max_index);
+}
+
+
+Vector4i Vector4i::min(const Vector4i &p_vector4i) const {
+	return Vector4i(MIN(x, p_vector4i.x), MIN(y, p_vector4i.y), MIN(z, p_vector4i.z), MIN(w, p_vector4i.w));
+}
+Vector4i Vector4i::mini(int32_t p_scalar) const {
+	return Vector4i(MIN(x, p_scalar), MIN(y, p_scalar), MIN(z, p_scalar), MIN(w, p_scalar));
+}
+Vector4i Vector4i::max(const Vector4i &p_vector4i) const {
+	return Vector4i(MAX(x, p_vector4i.x), MAX(y, p_vector4i.y), MAX(z, p_vector4i.z), MAX(w, p_vector4i.w));
+}
+Vector4i Vector4i::maxi(int32_t p_scalar) const {
+	return Vector4i(MAX(x, p_scalar), MAX(y, p_scalar), MAX(z, p_scalar), MAX(w, p_scalar));
 }
 
 Vector4i Vector4i::clamp(const Vector4i &p_min, const Vector4i &p_max) const {
@@ -91,6 +110,7 @@ Vector4i Vector4i::snappedi(int32_t p_step) const {
 			Math::snapped(w, p_step));
 }
 
+
 Vector4i::operator String() const {
 	return "(" + itos(x) + ", " + itos(y) + ", " + itos(z) + ", " + itos(w) + ")";
 }
@@ -107,3 +127,9 @@ Vector4i::Vector4i(const Vector4 &p_vec4) {
 }
 
 static_assert(sizeof(Vector4i) == 4 * sizeof(int32_t));
+
+
+
+
+
+

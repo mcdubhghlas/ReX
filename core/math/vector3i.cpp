@@ -35,12 +35,27 @@
 #include "core/math/vector3.h"
 #include "core/string/ustring.h"
 
+
+
 Vector3i::Axis Vector3i::min_axis_index() const {
 	return x < y ? (x < z ? Vector3i::AXIS_X : Vector3i::AXIS_Z) : (y < z ? Vector3i::AXIS_Y : Vector3i::AXIS_Z);
 }
 
 Vector3i::Axis Vector3i::max_axis_index() const {
 	return x < y ? (y < z ? Vector3i::AXIS_Z : Vector3i::AXIS_Y) : (x < z ? Vector3i::AXIS_Z : Vector3i::AXIS_X);
+}
+
+Vector3i Vector3i::min(const Vector3i &p_vector3i) const {
+	return Vector3i(MIN(x, p_vector3i.x), MIN(y, p_vector3i.y), MIN(z, p_vector3i.z));
+}
+Vector3i Vector3i::mini(int32_t p_scalar) const {
+	return Vector3i(MIN(x, p_scalar), MIN(y, p_scalar), MIN(z, p_scalar));
+}
+Vector3i Vector3i::max(const Vector3i &p_vector3i) const {
+	return Vector3i(MAX(x, p_vector3i.x), MAX(y, p_vector3i.y), MAX(z, p_vector3i.z));
+}
+Vector3i Vector3i::maxi(int32_t p_scalar) const {
+	return Vector3i(MAX(x, p_scalar), MAX(y, p_scalar), MAX(z, p_scalar));
 }
 
 Vector3i Vector3i::clamp(const Vector3i &p_min, const Vector3i &p_max) const {
@@ -71,6 +86,10 @@ Vector3i Vector3i::snappedi(int32_t p_step) const {
 			Math::snapped(z, p_step));
 }
 
+
+
+
+
 Vector3i::operator String() const {
 	return "(" + itos(x) + ", " + itos(y) + ", " + itos(z) + ")";
 }
@@ -78,3 +97,8 @@ Vector3i::operator String() const {
 Vector3i::operator Vector3() const {
 	return Vector3(x, y, z);
 }
+
+
+
+
+
