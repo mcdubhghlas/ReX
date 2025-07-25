@@ -143,10 +143,117 @@ struct [[nodiscard]] Vector2i {
 
 
 // Multiplication operators required to workaround issues with LLVM using implicit conversion.
-constexpr Vector2i operator*(int32_t p_scalar, const Vector2i &p_vector);
-constexpr Vector2i operator*(int64_t p_scalar, const Vector2i &p_vector);
-constexpr Vector2i operator*(float p_scalar, const Vector2i &p_vector);
-constexpr Vector2i operator*(double p_scalar, const Vector2i &p_vector);
+constexpr Vector2i operator*(int32_t p_scalar, const Vector2i &p_vector) {
+	return p_vector * p_scalar;
+}
+constexpr Vector2i operator*(int64_t p_scalar, const Vector2i &p_vector) {
+	return p_vector * p_scalar;
+}
+constexpr Vector2i operator*(float p_scalar, const Vector2i &p_vector) {
+	return p_vector * p_scalar;
+}
+constexpr Vector2i operator*(double p_scalar, const Vector2i &p_vector) {
+	return p_vector * p_scalar;
+}
+
+
+
+_FORCE_INLINE_ Vector2i::Axis Vector2i::min_axis_index() const {
+	return x < y ? Vector2i::AXIS_X : Vector2i::AXIS_Y;
+}
+_FORCE_INLINE_ Vector2i::Axis Vector2i::max_axis_index() const {
+	return x < y ? Vector2i::AXIS_Y : Vector2i::AXIS_X;
+}
+
+
+_FORCE_INLINE_ int32_t &Vector2i::operator[](int p_axis) {
+	DEV_ASSERT((unsigned int)p_axis < 2);
+	return coord[p_axis];
+}
+_FORCE_INLINE_ const int32_t &Vector2i::operator[](int p_axis) const {
+	DEV_ASSERT((unsigned int)p_axis < 2);
+	return coord[p_axis];
+}
+
+// Vectors
+
+constexpr Vector2i Vector2i::operator+(const Vector2i &p_v) const {
+	return Vector2i(x + p_v.x, y + p_v.y);
+}
+constexpr void Vector2i::operator+=(const Vector2i &p_v) {
+	x += p_v.x;
+	y += p_v.y;
+}
+
+constexpr Vector2i Vector2i::operator-(const Vector2i &p_v) const {
+	return Vector2i(x - p_v.x, y - p_v.y);
+}
+constexpr void Vector2i::operator-=(const Vector2i &p_v) {
+	x -= p_v.x;
+	y -= p_v.y;
+}
+
+constexpr Vector2i Vector2i::operator*(const Vector2i &p_v1) const {
+	return Vector2i(x * p_v1.x, y * p_v1.y);
+}
+
+constexpr Vector2i Vector2i::operator/(const Vector2i &p_v1) const {
+	return Vector2i(x / p_v1.x, y / p_v1.y);
+}
+
+constexpr Vector2i Vector2i::operator%(const Vector2i &p_v1) const {
+	return Vector2i(x % p_v1.x, y % p_v1.y);
+}
+
+// Scalar
+
+constexpr Vector2i Vector2i::operator*(int32_t p_rvalue) const {
+	return Vector2i(x * p_rvalue, y * p_rvalue);
+}
+constexpr void Vector2i::operator*=(int32_t p_rvalue) {
+	x *= p_rvalue;
+	y *= p_rvalue;
+}
+
+constexpr Vector2i Vector2i::operator/(int32_t p_rvalue) const {
+	return Vector2i(x / p_rvalue, y / p_rvalue);
+}
+constexpr void Vector2i::operator/=(int32_t p_rvalue) {
+	x /= p_rvalue;
+	y /= p_rvalue;
+}
+
+constexpr Vector2i Vector2i::operator%(int32_t p_rvalue) const {
+	return Vector2i(x % p_rvalue, y % p_rvalue);
+}
+constexpr void Vector2i::operator%=(int32_t p_rvalue) {
+	x %= p_rvalue;
+	y %= p_rvalue;
+}
+
+constexpr Vector2i Vector2i::operator-() const {
+	return Vector2i(-x, -y);
+}
+
+// Comparisons
+constexpr bool Vector2i::operator==(const Vector2i &p_vec2) const {
+	return x == p_vec2.x && y == p_vec2.y;
+}
+constexpr bool Vector2i::operator!=(const Vector2i &p_vec2) const {
+	return x != p_vec2.x || y != p_vec2.y;
+}
+constexpr bool Vector2i::operator<(const Vector2i &p_vec2) const {
+	return (x == p_vec2.x) ? (y < p_vec2.y) : (x < p_vec2.x);
+}
+constexpr bool Vector2i::operator>(const Vector2i &p_vec2) const {
+	return (x == p_vec2.x) ? (y > p_vec2.y) : (x > p_vec2.x);
+}
+constexpr bool Vector2i::operator<=(const Vector2i &p_vec2) const {
+	return x == p_vec2.x ? (y <= p_vec2.y) : (x < p_vec2.x);
+}
+constexpr bool Vector2i::operator>=(const Vector2i &p_vec2) const {
+	return x == p_vec2.x ? (y >= p_vec2.y) : (x > p_vec2.x);
+}
 
 using Size2i = Vector2i;
 using Point2i = Vector2i;

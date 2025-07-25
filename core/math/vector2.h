@@ -68,7 +68,7 @@ struct [[nodiscard]] Vector2 {
 
 	// TODO  zero()
 	Vector2 sign() const;
-	_FORCE_INLINE_ Vector2 abs() const;
+	Vector2 abs() const;
 	Vector2 floor() const;
 	Vector2 ceil() const;
 	Vector2 round() const;
@@ -88,7 +88,7 @@ struct [[nodiscard]] Vector2 {
 
 	real_t distance_to(const Vector2 &p_vector2) const;
 	real_t distance_squared_to(const Vector2 &p_vector2) const;
-	_FORCE_INLINE_ Vector2 direction_to(const Vector2 &p_to) const;
+	Vector2 direction_to(const Vector2 &p_to) const;
 
 	Vector2 project(const Vector2 &p_to) const;
 	Vector2 plane_project(real_t p_d, const Vector2 &p_vec) const;
@@ -188,12 +188,157 @@ struct [[nodiscard]] Vector2 {
 };
 
 
+_FORCE_INLINE_ Vector2::Axis Vector2::min_axis_index() const {
+	return x < y ? Vector2::AXIS_X : Vector2::AXIS_Y;
+}
+_FORCE_INLINE_ Vector2::Axis Vector2::max_axis_index() const {
+	return x < y ? Vector2::AXIS_Y : Vector2::AXIS_X;
+}
+
+
+_FORCE_INLINE_ Vector2 Vector2::lerp(const Vector2 &p_to, real_t p_weight) const {
+	Vector2 res = *this;
+	res.x = Math::lerp(res.x, p_to.x, p_weight);
+	res.y = Math::lerp(res.y, p_to.y, p_weight);
+	return res;
+}
+
+_FORCE_INLINE_ Vector2 Vector2::slerp(const Vector2 &p_to, real_t p_weight) const {
+	real_t start_length_sq = length_squared();
+	real_t end_length_sq = p_to.length_squared();
+	if (unlikely(start_length_sq == 0.0f || end_length_sq == 0.0f)) {
+		// Zero length vectors have no angle, so the best we can do is either lerp or throw an error.
+		return lerp(p_to, p_weight);
+	}
+	real_t start_length = Math::sqrt(start_length_sq);
+	real_t result_length = Math::lerp(start_length, Math::sqrt(end_length_sq), p_weight);
+	real_t angle = angle_to(p_to);
+	return rotated(angle * p_weight) * (result_length / start_length);
+}
+
+_FORCE_INLINE_ Vector2 Vector2::cubic_interpolate(const Vector2 &p_b, const Vector2 &p_pre_a, const Vector2 &p_post_b, real_t p_weight) const {
+	Vector2 res = *this;
+	res.x = Math::cubic_interpolate(res.x, p_b.x, p_pre_a.x, p_post_b.x, p_weight);
+	res.y = Math::cubic_interpolate(res.y, p_b.y, p_pre_a.y, p_post_b.y, p_weight);
+	return res;
+}
+
+_FORCE_INLINE_ Vector2 Vector2::cubic_interpolate_in_time(const Vector2 &p_b, const Vector2 &p_pre_a, const Vector2 &p_post_b, real_t p_weight, real_t p_b_t, real_t p_pre_a_t, real_t p_post_b_t) const {
+	Vector2 res = *this;
+	res.x = Math::cubic_interpolate_in_time(res.x, p_b.x, p_pre_a.x, p_post_b.x, p_weight, p_b_t, p_pre_a_t, p_post_b_t);
+	res.y = Math::cubic_interpolate_in_time(res.y, p_b.y, p_pre_a.y, p_post_b.y, p_weight, p_b_t, p_pre_a_t, p_post_b_t);
+	return res;
+}
+
+_FORCE_INLINE_ Vector2 Vector2::bezier_interpolate(const Vector2 &p_control_1, const Vector2 &p_control_2, const Vector2 &p_end, real_t p_t) const {
+	Vector2 res = *this;
+	res.x = Math::bezier_interpolate(res.x, p_control_1.x, p_control_2.x, p_end.x, p_t);
+	res.y = Math::bezier_interpolate(res.y, p_control_1.y, p_control_2.y, p_end.y, p_t);
+	return res;
+}
+
+_FORCE_INLINE_ Vector2 Vector2::bezier_derivative(const Vector2 &p_control_1, const Vector2 &p_control_2, const Vector2 &p_end, real_t p_t) const {
+	Vector2 res = *this;
+	res.x = Math::bezier_derivative(res.x, p_control_1.x, p_control_2.x, p_end.x, p_t);
+	res.y = Math::bezier_derivative(res.y, p_control_1.y, p_control_2.y, p_end.y, p_t);
+	return res;
+}
+
 // Multiplication operators required to workaround issues with LLVM using implicit conversion
 // to Vector2i instead for integers where it should not.
-constexpr Vector2 operator*(float p_scalar, const Vector2 &p_vec);
-constexpr Vector2 operator*(double p_scalar, const Vector2 &p_vec);
-constexpr Vector2 operator*(int32_t p_scalar, const Vector2 &p_vec);
-constexpr Vector2 operator*(int64_t p_scalar, const Vector2 &p_vec);
+constexpr Vector2 operator*(float p_scalar, const Vector2 &p_vec) {
+	return p_vec * p_scalar;
+}
+constexpr Vector2 operator*(double p_scalar, const Vector2 &p_vec) {
+	return p_vec * p_scalar;
+}
+constexpr Vector2 operator*(int32_t p_scalar, const Vector2 &p_vec) {
+	return p_vec * p_scalar;
+}
+constexpr Vector2 operator*(int64_t p_scalar, const Vector2 &p_vec) {
+	return p_vec * p_scalar;
+}
+
+_FORCE_INLINE_ real_t &Vector2::operator[](int p_axis) {
+	DEV_ASSERT((unsigned int)p_axis < 2);
+	return coord[p_axis];
+}
+_FORCE_INLINE_ const real_t &Vector2::operator[](int p_axis) const {
+	DEV_ASSERT((unsigned int)p_axis < 2);
+	return coord[p_axis];
+}
+
+constexpr Vector2 Vector2::operator+(const Vector2 &p_v) const {
+	return Vector2(x + p_v.x, y + p_v.y);
+}
+constexpr void Vector2::operator+=(const Vector2 &p_v) {
+	x += p_v.x;
+	y += p_v.y;
+}
+
+constexpr Vector2 Vector2::operator-(const Vector2 &p_v) const {
+	return Vector2(x - p_v.x, y - p_v.y);
+}
+constexpr void Vector2::operator-=(const Vector2 &p_v) {
+	x -= p_v.x;
+	y -= p_v.y;
+}
+
+constexpr Vector2 Vector2::operator*(const Vector2 &p_v1) const {
+	return Vector2(x * p_v1.x, y * p_v1.y);
+}
+constexpr void Vector2::operator*=(const Vector2 &p_rvalue) {
+	*this = *this * p_rvalue;
+}
+
+constexpr Vector2 Vector2::operator/(const Vector2 &p_v1) const {
+	return Vector2(x / p_v1.x, y / p_v1.y);
+}
+constexpr void Vector2::operator/=(const Vector2 &p_rvalue) {
+	*this = *this / p_rvalue;
+}
+
+// Scalars
+
+constexpr Vector2 Vector2::operator*(real_t p_rvalue) const {
+	return Vector2(x * p_rvalue, y * p_rvalue);
+}
+constexpr void Vector2::operator*=(real_t p_rvalue) {
+	x *= p_rvalue;
+	y *= p_rvalue;
+}
+
+constexpr Vector2 Vector2::operator/(real_t p_rvalue) const {
+	return Vector2(x / p_rvalue, y / p_rvalue);
+}
+constexpr void Vector2::operator/=(real_t p_rvalue) {
+	x /= p_rvalue;
+	y /= p_rvalue;
+}
+
+constexpr Vector2 Vector2::operator-() const {
+	return Vector2(-x, -y);
+}
+
+// Comparison
+constexpr bool Vector2::operator==(const Vector2 &p_vec2) const {
+	return x == p_vec2.x && y == p_vec2.y;
+}
+constexpr bool Vector2::operator!=(const Vector2 &p_vec2) const {
+	return x != p_vec2.x || y != p_vec2.y;
+}
+constexpr bool Vector2::operator<(const Vector2 &p_vec2) const {
+	return x == p_vec2.x ? (y < p_vec2.y) : (x < p_vec2.x);
+}
+constexpr bool Vector2::operator>(const Vector2 &p_vec2) const {
+	return x == p_vec2.x ? (y > p_vec2.y) : (x > p_vec2.x);
+}
+constexpr bool Vector2::operator<=(const Vector2 &p_vec2) const {
+	return x == p_vec2.x ? (y <= p_vec2.y) : (x < p_vec2.x);
+}
+constexpr bool Vector2::operator>=(const Vector2 &p_vec2) const {
+	return x == p_vec2.x ? (y >= p_vec2.y) : (x > p_vec2.x);
+}
 
 using Size2 = Vector2;
 using Point2 = Vector2;

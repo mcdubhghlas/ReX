@@ -34,6 +34,7 @@
 
 #include "core/error/error_macros.h"
 #include "core/math/math_defs.h"
+#include "core/math/math_funcs.h"
 #include "core/typedefs.h"
 
 class String;
@@ -163,10 +164,163 @@ struct [[nodiscard]] Vector4 {
 			x(p_x), y(p_y), z(p_z), w(p_w) {}
 };
 
-constexpr Vector4 operator*(float p_scalar, const Vector4 &p_vec);
-constexpr Vector4 operator*(double p_scalar, const Vector4 &p_vec);
-constexpr Vector4 operator*(int32_t p_scalar, const Vector4 &p_vec);
-constexpr Vector4 operator*(int64_t p_scalar, const Vector4 &p_vec);
+constexpr Vector4 operator*(float p_scalar, const Vector4 &p_vec) {
+	return p_vec * p_scalar;
+}
+constexpr Vector4 operator*(double p_scalar, const Vector4 &p_vec) {
+	return p_vec * p_scalar;
+}
+constexpr Vector4 operator*(int32_t p_scalar, const Vector4 &p_vec) {
+	return p_vec * p_scalar;
+}
+constexpr Vector4 operator*(int64_t p_scalar, const Vector4 &p_vec) {
+	return p_vec * p_scalar;
+}
+
+_FORCE_INLINE_ real_t Vector4::length() const {
+	return Math::sqrt(length_squared());
+}
+_FORCE_INLINE_ real_t Vector4::length_squared() const {
+	return dot(*this);
+}
+
+_FORCE_INLINE_ real_t Vector4::dot(const Vector4 &p_vec4) const {
+	return x * p_vec4.x + y * p_vec4.y + z * p_vec4.z + w * p_vec4.w;
+}
+
+
+_FORCE_INLINE_ real_t &Vector4::operator[](int p_axis) {
+	DEV_ASSERT((unsigned int)p_axis < 4);
+	return coord[p_axis];
+}
+_FORCE_INLINE_ const real_t &Vector4::operator[](int p_axis) const {
+	DEV_ASSERT((unsigned int)p_axis < 4);
+	return coord[p_axis];
+}
+
+constexpr Vector4 Vector4::operator+(const Vector4 &p_vec4) const {
+	return Vector4(x + p_vec4.x, y + p_vec4.y, z + p_vec4.z, w + p_vec4.w);
+}
+constexpr void Vector4::operator+=(const Vector4 &p_vec4) {
+	x += p_vec4.x;
+	y += p_vec4.y;
+	z += p_vec4.z;
+	w += p_vec4.w;
+}
+
+constexpr Vector4 Vector4::operator-(const Vector4 &p_vec4) const {
+	return Vector4(x - p_vec4.x, y - p_vec4.y, z - p_vec4.z, w - p_vec4.w);
+}
+constexpr void Vector4::operator-=(const Vector4 &p_vec4) {
+	x -= p_vec4.x;
+	y -= p_vec4.y;
+	z -= p_vec4.z;
+	w -= p_vec4.w;
+}
+
+constexpr Vector4 Vector4::operator*(const Vector4 &p_vec4) const {
+	return Vector4(x * p_vec4.x, y * p_vec4.y, z * p_vec4.z, w * p_vec4.w);
+}
+constexpr void Vector4::operator*=(const Vector4 &p_vec4) {
+	x *= p_vec4.x;
+	y *= p_vec4.y;
+	z *= p_vec4.z;
+	w *= p_vec4.w;
+}
+
+constexpr Vector4 Vector4::operator/(const Vector4 &p_vec4) const {
+	return Vector4(x / p_vec4.x, y / p_vec4.y, z / p_vec4.z, w / p_vec4.w);
+}
+constexpr void Vector4::operator/=(const Vector4 &p_vec4) {
+	x /= p_vec4.x;
+	y /= p_vec4.y;
+	z /= p_vec4.z;
+	w /= p_vec4.w;
+}
+
+constexpr Vector4 Vector4::operator*(real_t p_s) const {
+	return Vector4(x * p_s, y * p_s, z * p_s, w * p_s);
+}
+constexpr void Vector4::operator*=(real_t p_s) {
+	x *= p_s;
+	y *= p_s;
+	z *= p_s;
+	w *= p_s;
+}
+
+constexpr Vector4 Vector4::operator/(real_t p_s) const {
+	return *this * (1 / p_s);
+}
+constexpr void Vector4::operator/=(real_t p_s) {
+	*this *= (1 / p_s);
+}
+
+
+
+constexpr bool Vector4::operator==(const Vector4 &p_vec4) const {
+	return x == p_vec4.x && y == p_vec4.y && z == p_vec4.z && w == p_vec4.w;
+}
+
+constexpr bool Vector4::operator!=(const Vector4 &p_vec4) const {
+	return x != p_vec4.x || y != p_vec4.y || z != p_vec4.z || w != p_vec4.w;
+}
+
+constexpr bool Vector4::operator<(const Vector4 &p_v) const {
+	if (x == p_v.x) {
+		if (y == p_v.y) {
+			if (z == p_v.z) {
+				return w < p_v.w;
+			}
+			return z < p_v.z;
+		}
+		return y < p_v.y;
+	}
+	return x < p_v.x;
+}
+
+constexpr bool Vector4::operator>(const Vector4 &p_v) const {
+	if (x == p_v.x) {
+		if (y == p_v.y) {
+			if (z == p_v.z) {
+				return w > p_v.w;
+			}
+			return z > p_v.z;
+		}
+		return y > p_v.y;
+	}
+	return x > p_v.x;
+}
+
+constexpr bool Vector4::operator<=(const Vector4 &p_v) const {
+	if (x == p_v.x) {
+		if (y == p_v.y) {
+			if (z == p_v.z) {
+				return w <= p_v.w;
+			}
+			return z < p_v.z;
+		}
+		return y < p_v.y;
+	}
+	return x < p_v.x;
+}
+
+constexpr bool Vector4::operator>=(const Vector4 &p_v) const {
+	if (x == p_v.x) {
+		if (y == p_v.y) {
+			if (z == p_v.z) {
+				return w >= p_v.w;
+			}
+			return z > p_v.z;
+		}
+		return y > p_v.y;
+	}
+	return x > p_v.x;
+}
+
+
+constexpr Vector4 Vector4::operator-() const {
+	return Vector4(-x, -y, -z, -w);
+}
 
 template <>
 struct is_zero_constructible<Vector4> : std::true_type {};
