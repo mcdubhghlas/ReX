@@ -2363,10 +2363,11 @@ void Image::initialize_data(const char **p_xpm) {
 			case READING_PIXELS: {
 				int y = line - colormap_size - 1;
 				for (int x = 0; x < size_width; x++) {
-					char pixelstr[6] = { 0, 0, 0, 0, 0, 0 };
-					for (int i = 0; i < pixelchars; i++) {
-						pixelstr[i] = line_ptr[x * pixelchars + i];
-					}
+					// caps to 8 to be safe.
+					constexpr size_t MAX_PIXEL_STR_SIZE = 8;
+					char pixelstr[MAX_PIXEL_STR_SIZE];
+					// memcpy is faster than a loop, provided sane size.
+					memcpy(pixelstr, &line_ptr[x * pixelchars], pixelchars);
 
 					Color *colorptr = colormap.getptr(pixelstr);
 					ERR_FAIL_NULL(colorptr);

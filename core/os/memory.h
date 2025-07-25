@@ -204,7 +204,15 @@ _FORCE_INLINE_ void memnew_arr_placement(T *p_start, size_t p_num) {
 		(void)p_num;
 	} else if constexpr (is_zero_constructible_v<T>) {
 		// Can optimize with memset.
-		memset(static_cast<void *>(p_start), 0, p_num * sizeof(T));
+		constexpr size_t max_safe_size = SIZE_MAX / sizeof(T);
+
+		// Fixes out of bounds error.
+		if (__builtin_constant_p(p_num)) {
+			memset(static_cast<void *>(p_start), 0, p_num * sizeof(T));
+		} else { 
+			size_t safe_len = p_num <= max_safe_size ? p_num * sizeof(T) : 0;
+			memset(static_cast<void *>(p_start), 0, safe_len);
+		}
 	} else {
 		// Need to use a for loop.
 		for (size_t i = 0; i < p_num; i++) {
