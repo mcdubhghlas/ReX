@@ -228,7 +228,7 @@ bool _prepareLinear(SwFill* fill, const LinearGradient* linear, const Matrix& tr
     fill->linear.offset = -fill->linear.dx * x1 - fill->linear.dy * y1;
 
     auto gradTransform = linear->transform();
-    bool isTransformation = !tvg::identity((const Matrix*)(&gradTransform));
+    bool isTransformation = !tvg::identity(static_cast<const Matrix*>(&gradTransform));
 
     if (isTransformation) {
         gradTransform = transform * gradTransform;
@@ -295,7 +295,11 @@ bool _prepareRadial(SwFill* fill, const RadialGradient* radial, const Matrix& tr
     if (fill->radial.a > 0) fill->radial.invA = 1.0f / fill->radial.a;
 
     auto gradTransform = radial->transform();
+<<<<<<< HEAD
     bool isTransformation = !tvg::identity((const Matrix*)(&gradTransform));
+=======
+    bool isTransformation = !tvg::identity(static_cast<Matrix const*>(&gradTransform));
+>>>>>>> upstream/CMake-Build
 
     if (isTransformation) gradTransform = transform * gradTransform;
     else {

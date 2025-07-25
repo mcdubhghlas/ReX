@@ -50,6 +50,7 @@ struct GCHandleIntPtr {
 	_FORCE_INLINE_ bool operator==(const GCHandleIntPtr &p_other) { return value == p_other.value; }
 	_FORCE_INLINE_ bool operator!=(const GCHandleIntPtr &p_other) { return value != p_other.value; }
 
+	_FORCE_INLINE_ GCHandleIntPtr(void *p_value = nullptr) : value(p_value) {}
 	GCHandleIntPtr() = delete;
 };
 }
